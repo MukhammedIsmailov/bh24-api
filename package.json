@@ -1,0 +1,27 @@
+{
+  "name": "bh24-api",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "./node_modules/.bin/tsc",
+    "prestart": "node dist/index.js",
+    "start": "npm run build && npm run prestart"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MukhammedIsmailov/bh24-api.git"
+  },
+  "author": "Mukhammed Ismailov <misterrevi4@gmail.com>",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-json": "^2.0.2",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^7.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.11.7",
+    "typescript": "^3.6.4"
+  }
+}
