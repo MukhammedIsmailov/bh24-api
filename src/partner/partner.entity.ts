@@ -1,58 +1,78 @@
 import { Entity , PrimaryGeneratedColumn, Column } from "typeorm";
+import { IsString, IsUrl, IsEmail } from 'class-validator';
 
-@Entity()
+@Entity( {name: 'partner'} )
 export class PartnerEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ name: 'first_name' })
+    @IsString()
     firstName: string;
 
     @Column({ name: 'second_name' })
+    @IsString()
     secondName: string;
 
     @Column({ name: 'refer_id' })
+    @IsString()
     referId: string;
 
     @Column({ name: 'icon_url' })
+    @IsString()
+    @IsUrl()
     iconUrl: string;
 
     @Column({ name: 'phone_number' })
+    @IsString()
     phoneNumber: string;
 
     @Column()
+    @IsString()
+    @IsEmail()
     email: string;
 
     @Column()
+    @IsString()
     login: string;
 
     @Column()
+    @IsString()
     password: string;
 
     @Column()
+    @IsString()
     facebook: string;
 
     @Column()
+    @IsString()
     telegram: string;
 
     @Column()
+    @IsString()
     skype: string;
 
     @Column()
+    @IsString()
     viber: string;
 
-    @Column({ name: 'question_who_are_you' })
+    @Column({ name: 'question_who_are_you', type: 'text' })
+    @IsString()
     questionWhoAreYou: string;
 
-    @Column({ name: 'question_why' })
+    @Column({ name: 'question_why', type: 'text' })
+    @IsString()
     questionWhy: string;
 
-    @Column({ name: 'question_value' })
+    @Column({ name: 'question_value', type: 'text' })
+    @IsString()
     questionValue: string;
 
-    @Column({ name: 'question_staff' })
+    @Column({ name: 'question_staff', type: 'text' })
+    @IsString()
     questionStaff: string;
 
     @Column({ name: 'question_results' })
+    @IsString()
     questionResults: string;
 }

@@ -14,6 +14,7 @@
   },
   "author": "Mukhammed Ismailov <misterrevi4@gmail.com>",
   "dependencies": {
+    "class-validator": "^0.10.2",
     "dotenv": "^8.2.0",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
