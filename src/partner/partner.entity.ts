@@ -1,5 +1,7 @@
-import { Entity , PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity , PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { IsString, IsUrl, IsEmail } from 'class-validator';
+
+import { LeadEntity } from "../lead/lead.entity";
 
 @Entity( {name: 'partner'} )
 export class PartnerEntity {
@@ -75,4 +77,7 @@ export class PartnerEntity {
     @Column({ name: 'question_results' })
     @IsString()
     questionResults: string;
+
+    @OneToMany(type => LeadEntity, lead => lead.partner)
+    leads: LeadEntity[]
 }

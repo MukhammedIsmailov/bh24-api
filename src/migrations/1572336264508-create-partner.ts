@@ -96,6 +96,6 @@ export class createPartner1572336264508 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.dropTable("question");
+        await queryRunner.dropTable('partner');
     }
 }
