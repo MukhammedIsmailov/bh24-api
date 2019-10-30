@@ -5,7 +5,7 @@ import { PartnerEntity } from '../partner/partner.entity';
 import { ILead } from './DTO/lead';
 
 export class LeadController {
-    static async read (ctx, next) {
+    static async create (ctx, next) {
         const data = <ILead>ctx.params;
 
         const partnerRepository = getManager().getRepository(PartnerEntity);
