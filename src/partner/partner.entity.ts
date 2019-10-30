@@ -1,5 +1,5 @@
-import { Entity , PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { IsString, IsUrl, IsEmail } from 'class-validator';
+import { Entity , PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from 'typeorm';
+import { IsString, IsUrl, IsEmail, IsDate } from 'class-validator';
 
 import { LeadEntity } from "../lead/lead.entity";
 
@@ -77,6 +77,10 @@ export class PartnerEntity {
     @Column({ name: 'question_results' })
     @IsString()
     questionResults: string;
+
+    @Column({ name: 'created_date' })
+    @IsDate()
+    createdDate: string;
 
     @OneToMany(type => LeadEntity, lead => lead.partner)
     leads: LeadEntity[]

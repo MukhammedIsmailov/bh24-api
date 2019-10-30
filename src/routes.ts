@@ -7,6 +7,6 @@ const routes = new Router({ prefix: '/api' });
 
 routes.put('/partner', PartnerController.create);
 
-routes.get('/lead/:referId', LeadController.read);
+routes.get('/lead/:referId/:type', LeadController.read);
 
 export default routes;
