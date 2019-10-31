@@ -9,7 +9,6 @@ export interface IPartner {
     telegram: string;
     skype: string;
     viber: string;
-    login: string;
     password: string;
     questionWhoAreYou: string;
     questionWhy: string;

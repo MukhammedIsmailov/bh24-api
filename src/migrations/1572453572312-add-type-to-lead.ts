@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner, TableColumn} from "typeorm";
+import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addTypeToLead1572453572312 implements MigrationInterface {
 
@@ -10,7 +10,6 @@ export class addTypeToLead1572453572312 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<any> {
-
         await queryRunner.dropColumn('lead', 'type');
     }
 

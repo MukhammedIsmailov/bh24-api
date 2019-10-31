@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
+import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addDates1572447360919 implements MigrationInterface {
 

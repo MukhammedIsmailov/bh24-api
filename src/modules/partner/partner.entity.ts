@@ -36,10 +36,6 @@ export class PartnerEntity {
 
     @Column()
     @IsString()
-    login: string;
-
-    @Column()
-    @IsString()
     password: string;
 
     @Column()
