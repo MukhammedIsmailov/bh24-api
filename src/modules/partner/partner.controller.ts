@@ -1,6 +1,6 @@
 import { getManager } from 'typeorm';
 
-import { IPartner } from './DTO/partner';
+import { IPartner } from './DTO/IPartner';
 import { PartnerEntity } from './partner.entity';
 import { getEncryptedPassword } from './partner.service';
 

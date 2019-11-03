@@ -3,7 +3,7 @@ import { IsString, IsUrl, IsEmail, IsDate } from 'class-validator';
 
 import { LeadEntity } from "../lead/lead.entity";
 
-@Entity( {name: 'partner'} )
+@Entity({ name: 'partner' })
 export class PartnerEntity {
     @PrimaryGeneratedColumn()
     id: number;
@@ -79,5 +79,5 @@ export class PartnerEntity {
     createdDate: string;
 
     @OneToMany(type => LeadEntity, lead => lead.partner)
-    leads: LeadEntity[]
+    leads: LeadEntity[];
 }

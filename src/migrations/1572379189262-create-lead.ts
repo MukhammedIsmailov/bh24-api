@@ -34,5 +34,4 @@ export class createLead1572379189262 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<any> {
         await queryRunner.dropTable('lead');
     }
-
 }

@@ -8,7 +8,7 @@ const routes = new Router({ prefix: '/api' });
 
 routes.put('/partner', PartnerController.create);
 
-routes.get('/lead/:referId/:type', LeadController.create);
+routes.put('/lead', LeadController.create);
 
 routes.get('/landing-1/:referId', LandingController.getLanding1);
 routes.get('/landing-2/:referId', LandingController.getLanding2);

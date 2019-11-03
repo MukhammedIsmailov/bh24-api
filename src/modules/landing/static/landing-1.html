@@ -6,11 +6,15 @@
 </head>
 <body>
     <h1>Hello world!</h1>
+    <button onclick="telegramClick()">Telegram</button>
+
     <script>
-        const path = new URL(document.URL).pathname;
-        const slashIndex = path.lastIndexOf('/');
-        const referId = path.substring(slashIndex + 1);
-        fetch(`http://localhost:3000/api/lead/${referId}/1`);
+        function telegramClick() {
+            const path = new URL(document.URL).pathname;
+            const slashIndex = path.lastIndexOf('/');
+            const referId = path.substring(slashIndex + 1);
+            location.replace(`https://t.me/behappy_test_bot?start=${referId}`);
+        }
     </script>
 </body>
 </html>

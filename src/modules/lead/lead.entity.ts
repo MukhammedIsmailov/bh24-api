@@ -1,9 +1,10 @@
-import {Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column, OneToMany } from 'typeorm';
 import { IsDate, IsInt } from 'class-validator';
 
 import { PartnerEntity } from '../partner/partner.entity';
+import { LeadMessengersEntity } from '../leadMessengers/leadMessengers.entity';
 
-@Entity( {name: 'lead'} )
+@Entity({ name: 'lead' })
 export class LeadEntity {
     @PrimaryGeneratedColumn()
     id: number;
@@ -19,4 +20,7 @@ export class LeadEntity {
     @ManyToOne(type => PartnerEntity, partner => partner.leads)
     @JoinColumn({ name: 'partner_id' })
     partner: PartnerEntity;
+
+    @OneToMany(type => LeadMessengersEntity, messenger => messenger.lead)
+    messengers: LeadMessengersEntity[];
 }
