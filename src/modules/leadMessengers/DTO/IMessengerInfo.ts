@@ -7,4 +7,5 @@ export enum Messenger {
 export interface IMessengerInfo {
     messenger: Messenger;
     info: string;
+    step: number;
 }

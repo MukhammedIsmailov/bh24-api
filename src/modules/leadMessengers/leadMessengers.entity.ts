@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {IsDate, IsInt, IsPositive} from 'class-validator';
 
 import { LeadEntity } from '../lead/lead.entity';
 
@@ -15,6 +16,15 @@ export class LeadMessengersEntity {
 
     @Column({ name: 'viber_info', default: null })
     viberInfo: string;
+
+    @IsInt()
+    @IsPositive()
+    @Column({ name: 'step' })
+    step: number;
+
+    @Column({ name: 'last_send_time' })
+    @IsDate()
+    lastSendTime: string;
 
     @ManyToOne(type => LeadEntity, lead => lead.messengers)
     @JoinColumn({ name: 'lead_id' })

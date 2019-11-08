@@ -18,5 +18,4 @@ export class addDates1572447360919 implements MigrationInterface {
         await queryRunner.dropColumn('partner', 'create_date');
         await queryRunner.dropColumn('lead', 'create_date');
     }
-
 }
