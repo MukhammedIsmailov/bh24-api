@@ -9,8 +9,8 @@ module.exports = {
     database: process.env.DB_NAME,
     logging: true,
     synchronize: false,
-    entities: ['src/modules/**/**.entity.ts'],
-    migrations: ['src/migrations/*.ts'],
+    entities: [`${process.env.ENV === 'prod' ? 'dist/':''}src/modules/**/**.entity.ts`],
+    migrations: [`${process.env.ENV === 'prod' ? 'dist/':''}src/migrations/*.ts`],
     cli: {
         migrationsDir: "src/migrations"
     }
