@@ -53,7 +53,7 @@ export class createPartner1572336264508 implements MigrationInterface {
                 {
                     name: 'password',
                     type: 'varchar',
-                    isNullable: false
+                    isNullable: true
                 },
                 {
                     name: 'facebook',
