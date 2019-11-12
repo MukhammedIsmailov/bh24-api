@@ -4,6 +4,7 @@ import { ICreatePartner } from './DTO/ICreatePartner';
 import { IUpdatePartner } from './DTO/IUpdatePartner';
 import { PartnerEntity } from './partner.entity';
 import { createValidator, updateValidator } from './partner.validator';
+import { getEncryptedPassword } from './partner.service';
 
 export class PartnerController {
     static async create (ctx, next) {
@@ -35,6 +36,7 @@ export class PartnerController {
         if (!!partner) {
             const wrongFields = await updateValidator(id, data, partnerRepository);
             if (wrongFields.length === 0) {
+                data.password = getEncryptedPassword(data.password);
                 await partnerRepository.update(id, data);
                 ctx.response.body = await partnerRepository.findOne({ id: id });
                 ctx.status = 200;
