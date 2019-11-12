@@ -1,4 +1,4 @@
-export interface IPartner {
+export interface IUpdatePartner {
     firstName: string;
     secondName: string;
     referId: string;
@@ -9,6 +9,8 @@ export interface IPartner {
     telegram: string;
     skype: string;
     viber: string;
+    vk: string;
+    whatsapp: string;
     password: string;
     questionWhoAreYou: string;
     questionWhy: string;

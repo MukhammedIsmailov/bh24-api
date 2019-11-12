@@ -8,6 +8,7 @@ import { LeadMessengersController } from './modules/leadMessengers/leadMessenger
 const routes = new Router({ prefix: '/api' });
 
 routes.put('/partner', PartnerController.create);
+routes.post('/partner', PartnerController.update);
 
 routes.put('/lead', LeadController.create);
 

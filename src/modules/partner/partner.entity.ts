@@ -43,6 +43,12 @@ export class PartnerEntity {
     @Column()
     viber: string;
 
+    @Column()
+    vk: string;
+
+    @Column()
+    whatsapp: string;
+
     @Column({ name: 'question_who_are_you', type: 'text' })
     questionWhoAreYou: string;
 

@@ -76,6 +76,16 @@ export class createPartner1572336264508 implements MigrationInterface {
                     isNullable: true
                 },
                 {
+                    name: 'vk',
+                    type: 'varchar',
+                    isNullable: true
+                },
+                {
+                    name: 'whatsapp',
+                    type: 'varchar',
+                    isNullable: true
+                },
+                {
                     name: 'question_who_are_you',
                     type: 'text',
                     isNullable: true

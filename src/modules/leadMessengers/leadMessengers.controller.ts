@@ -1,5 +1,5 @@
 import { getManager } from 'typeorm';
-import {LeadMessengersEntity} from "./leadMessengers.entity";
+import { LeadMessengersEntity } from './leadMessengers.entity';
 
 export class LeadMessengersController {
         static async readAll (ctx, next) {
