@@ -27,22 +27,22 @@ export class createPartner1572336264508 implements MigrationInterface {
                     name: 'refer_id',
                     type: 'varchar',
                     isUnique: true,
-                    isNullable: false
+                    isNullable: true
                 },
                 {
                     name: 'icon_url',
                     type: 'varchar',
-                    isNullable: false
+                    isNullable: true
                 },
                 {
                     name: 'phone_number',
                     type: 'varchar',
-                    isNullable: false
+                    isNullable: true
                 },
                 {
                     name: 'email',
                     type: 'varchar',
-                    isNullable: false
+                    isNullable: true
                 },
                 {
                     name: 'login',
@@ -57,39 +57,48 @@ export class createPartner1572336264508 implements MigrationInterface {
                 },
                 {
                     name: 'facebook',
-                    type: 'varchar'
+                    type: 'varchar',
+                    isNullable: true
                 },
                 {
                     name: 'telegram',
-                    type: 'varchar'
+                    type: 'varchar',
+                    isNullable: true
                 },
                 {
                     name: 'skype',
-                    type: 'varchar'
+                    type: 'varchar',
+                    isNullable: true
                 },
                 {
                     name: 'viber',
-                    type: 'varchar'
+                    type: 'varchar',
+                    isNullable: true
                 },
                 {
                     name: 'question_who_are_you',
-                    type: 'text'
+                    type: 'text',
+                    isNullable: true
                 },
                 {
                     name: 'question_why',
-                    type: 'text'
+                    type: 'text',
+                    isNullable: true
                 },
                 {
                     name: 'question_value',
-                    type: 'text'
+                    type: 'text',
+                    isNullable: true
                 },
                 {
                     name: 'question_staff',
-                    type: 'text'
+                    type: 'text',
+                    isNullable: true
                 },
                 {
                     name: 'question_results',
-                    type: 'text'
+                    type: 'text',
+                    isNullable: true
                 },
             ]
         }),true)
