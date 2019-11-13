@@ -2,6 +2,7 @@ import * as Koa from 'koa';
 import * as logger from 'koa-logger';
 import * as json from 'koa-json';
 import * as bodyParser from 'koa-bodyparser';
+import * as body from 'koa-body';
 
 import { createConnection } from 'typeorm';
 
@@ -19,6 +20,7 @@ createConnection().then(async connection => {
     app.use(json());
     app.use(logger());
     app.use(bodyParser());
+    app.use(body({ multipart: true }));
 
     app.use(routes.routes()).use(routes.allowedMethods());
 
