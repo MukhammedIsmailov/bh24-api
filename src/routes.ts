@@ -4,9 +4,10 @@ import { PartnerController } from './modules/partner/partner.controller';
 import { LeadController } from './modules/lead/lead.controller';
 import { LandingController } from './modules/landing/landing.controller';
 import { LeadMessengersController } from './modules/leadMessengers/leadMessengers.controller';
+import { verifyToken } from './lib/jwt';
 
 const routes = new Router({ prefix: '/api' });
-
+routes.post('/login', PartnerController.authorize);
 routes.put('/partner', PartnerController.create);
 routes.post('/partner', PartnerController.update);
 
