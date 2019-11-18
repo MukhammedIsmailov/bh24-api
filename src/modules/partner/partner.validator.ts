@@ -1,11 +1,12 @@
-import {Equal, Not, Repository} from 'typeorm';
+import { Equal, Not, Repository } from 'typeorm';
 
-import {ICreatePartner} from './DTO/ICreatePartner';
-import {IUpdatePartner} from './DTO/IUpdatePartner';
-import {isEmpty} from '../../lib/baseValidator';
-import {IBaseValidatorResponse, IValidatorResponse} from '../../lib/ValidatorResponses';
-import {PartnerEntity} from './partner.entity';
-import {Error} from '../../lib/error';
+import { ICreatePartner } from './DTO/ICreatePartner';
+import { IUpdatePartner } from './DTO/IUpdatePartner';
+import { IAuthorizePartner } from './DTO/IAuthorizePartner';
+import { isEmpty } from '../../lib/baseValidator';
+import { IBaseValidatorResponse, IValidatorResponse } from '../../lib/ValidatorResponses';
+import { PartnerEntity } from './partner.entity';
+import { Error } from '../../lib/error';
 
 export async function createValidator(inputData: ICreatePartner, repository: Repository<PartnerEntity>) {
     const wrongFields: IValidatorResponse[] = [];
@@ -45,6 +46,20 @@ export async function updateValidator(id: number, inputData: IUpdatePartner, rep
     const checkPassword = isValidPassword(inputData.password);
     if(checkPassword.errorStatus) {
         wrongFields.push({ field: 'password', error: checkPassword.error });
+    }
+
+    return wrongFields;
+}
+
+export function loginValidator(inputData: IAuthorizePartner) {
+    const wrongFields: IValidatorResponse[] = [];
+    const fieldsForValidation = ['login', 'password'];
+
+    for (const key of fieldsForValidation) {
+        const result = isEmpty(inputData[key]);
+        if(result.errorStatus) {
+            wrongFields.push({ field: key, error: result.error });
+        }
     }
 
     return wrongFields;

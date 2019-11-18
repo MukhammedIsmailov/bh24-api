@@ -21,7 +21,7 @@ export class Config {
             dbUser: process.env.DB_USER,
             dbPass: process.env.DB_PASS,
             appPort: process.env.APP_PORT,
-            jwtSecretKey: process.env.JWT_PRIVATE_KEY,
+            jwtSecretKey: process.env.JWT_SECRET_KEY,
             jwtTokenExpireInMinutes: Number.parseInt(process.env.JWT_TOKEN_EXPIRE_IN_MINUTES),
         }
     }

@@ -5,25 +5,30 @@ import { ICreatePartner } from './DTO/ICreatePartner';
 import { IUpdatePartner } from './DTO/IUpdatePartner';
 import { IAuthorizePartner } from './DTO/IAuthorizePartner';
 import { PartnerEntity } from './partner.entity';
-import { createValidator, updateValidator } from './partner.validator';
+import { createValidator, updateValidator, loginValidator } from './partner.validator';
 import { getEncryptedPassword, comparePasswords } from './partner.service';
 import { getConfig } from '../../config';
 
 export class PartnerController {
     static async create (ctx, next) {
-        const data: ICreatePartner = ctx.request.body;
-        const partnerRepository = getManager().getRepository(PartnerEntity);
+        try {
+            const data: ICreatePartner = ctx.request.body;
+            const partnerRepository = getManager().getRepository(PartnerEntity);
 
-        const wrongFields = await createValidator(data, partnerRepository);
+            const wrongFields = await createValidator(data, partnerRepository);
 
-        if (wrongFields.length === 0) {
-            const newPartner = await partnerRepository.create({ ...data, createdDate: new Date().toISOString() });
+            if (wrongFields.length === 0) {
+                const newPartner = await partnerRepository.create({ ...data, createdDate: new Date().toISOString() });
 
-            ctx.response.body = await partnerRepository.save(newPartner);
-            ctx.status = 200;
-        } else {
-            ctx.status = 400;
-            ctx.response.body = wrongFields;
+                ctx.response.body = await partnerRepository.save(newPartner);
+                ctx.status = 200;
+            } else {
+                ctx.status = 400;
+                ctx.response.body = wrongFields;
+            }
+        } catch (e) {
+            ctx.status = 500;
+            ctx.response.body = e.message;
         }
 
         await next();
@@ -59,18 +64,27 @@ export class PartnerController {
 
         const partnerRepository = getManager().getRepository(PartnerEntity);
 
-        const partner = await partnerRepository.findOne( { login: data.login });
-        if (partner) {
-            if (comparePasswords(partner.password, data.password)) {
-                const config = getConfig();
-                const token = sign({id: partner.id }, config.jwtSecretKey, {
-                    expiresIn: config.jwtTokenExpireInMinutes
-                });
-                ctx.response.body = { token };
-                return ctx.status = 200;
+        const wrongFields = loginValidator(data);
+
+        if (wrongFields.length === 0) {
+            const partner = await partnerRepository.findOne( { login: data.login });
+            if (partner) {
+                if (comparePasswords(partner.password, data.password)) {
+                    const config = getConfig();
+                    const token = sign({id: partner.id }, config.jwtSecretKey, {
+                        expiresIn: config.jwtTokenExpireInMinutes
+                    });
+                    ctx.response.body = { token };
+                    return ctx.status = 200;
+                }
+            } else {
+                ctx.status = 404;
             }
         } else {
-            ctx.status = 404;
+            ctx.status = 400;
+            ctx.response.body = wrongFields;
         }
+
+        next();
     }
 }
