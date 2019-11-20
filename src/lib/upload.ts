@@ -13,10 +13,11 @@ export function upload(ctx, next) {
             const hash = createHash('md5').update(Math.random().toString()).digest('hex');
             const filePath = normalize(`${__dirname}/../../data/icons/${hash}_${icon.name}`);
             writeFileSync(filePath, readFileSync(icon.path));
-            ctx.response.body = { iconName: `${hash}_${icon.name}`}
+            ctx.response.body = { iconName: `${hash}_${icon.name}`};
             ctx.status = 201;
         }
         catch (e) {
+            console.log(e);
             ctx.status = 400;
         }
     } else {

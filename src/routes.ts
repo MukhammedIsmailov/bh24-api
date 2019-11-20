@@ -1,4 +1,5 @@
 import * as Router from 'koa-router';
+import * as body from 'koa-body';
 
 import { PartnerController } from './modules/partner/partner.controller';
 import { LeadController } from './modules/lead/lead.controller';
@@ -22,6 +23,6 @@ routes.get('/landing-2/:referId', LandingController.getLanding2);
 routes.get('/landing-3/:referId', LandingController.getLanding3);
 routes.get('/landing-4/:referId', LandingController.getLanding4);
 
-routes.post('/upload', upload);
+routes.post('/upload', body({ multipart: true }), upload);
 
 export default routes;

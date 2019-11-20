@@ -3,7 +3,7 @@ import * as logger from 'koa-logger';
 import * as json from 'koa-json';
 import * as bodyParser from 'koa-bodyparser';
 import * as cors from '@koa/cors';
-// import * as body from 'koa-body';
+import * as serve from 'koa-static';
 
 import { createConnection } from 'typeorm';
 
@@ -22,7 +22,7 @@ createConnection().then(async connection => {
     app.use(logger());
     app.use(bodyParser());
     app.use(cors());
-    // app.use(body({ multipart: true }));
+    app.use(serve('./data'));
 
     app.use(routes.routes()).use(routes.allowedMethods());
 
