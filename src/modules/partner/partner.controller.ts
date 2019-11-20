@@ -10,6 +10,22 @@ import { getEncryptedPassword, comparePasswords } from './partner.service';
 import { getConfig } from '../../config';
 
 export class PartnerController {
+    static async read (ctx, next) {
+        const id = Number.parseInt(ctx.request.query.id);
+
+        const partnerRepository = getManager().getRepository(PartnerEntity);
+
+        const partner = await partnerRepository.findOne({ id: id });
+        if (!!partner) {
+            ctx.response.body = partner;
+            ctx.status = 200;
+        } else {
+            ctx.reponse.status = 404;
+        }
+
+        next();
+    }
+
     static async create (ctx, next) {
         try {
             const data: ICreatePartner = ctx.request.body;
@@ -31,7 +47,7 @@ export class PartnerController {
             ctx.response.body = e.message;
         }
 
-        await next();
+        next();
     }
 
     static async update (ctx, next) {
@@ -56,7 +72,7 @@ export class PartnerController {
             ctx.status = 404;
         }
 
-        await next();
+        next();
     }
 
     static async authorize (ctx, next) {

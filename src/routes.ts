@@ -9,6 +9,7 @@ import { upload } from './lib/upload';
 
 const routes = new Router({ prefix: '/api' });
 routes.post('/login', PartnerController.authorize);
+routes.get('/partner', PartnerController.read);
 routes.put('/partner', PartnerController.create);
 routes.post('/partner', PartnerController.update);
 
