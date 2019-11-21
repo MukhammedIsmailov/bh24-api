@@ -29,7 +29,7 @@ export async function createValidator(inputData: ICreatePartner, repository: Rep
 
 export async function updateValidator(id: number, inputData: IUpdatePartner, repository: Repository<PartnerEntity>) {
     const wrongFields: IValidatorResponse[] = [];
-    const fieldsForValidation = ['firstName', 'secondName', 'referId', 'iconUrl', 'phoneNumber', 'email', 'password'];
+    const fieldsForValidation = ['firstName', 'secondName', 'referId', 'iconUrl', 'phoneNumber', 'email'];
 
     for (const key of fieldsForValidation) {
         const result = isEmpty(inputData[key]);
@@ -43,9 +43,11 @@ export async function updateValidator(id: number, inputData: IUpdatePartner, rep
         wrongFields.push({ field: 'login', error: checkReferId.error });
     }
 
-    const checkPassword = isValidPassword(inputData.password);
-    if(checkPassword.errorStatus) {
-        wrongFields.push({ field: 'password', error: checkPassword.error });
+    if (!!inputData.password) {
+        const checkPassword = isValidPassword(inputData.password);
+        if(checkPassword.errorStatus) {
+            wrongFields.push({ field: 'password', error: checkPassword.error });
+        }
     }
 
     return wrongFields;

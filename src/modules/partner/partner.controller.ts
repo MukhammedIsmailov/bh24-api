@@ -60,7 +60,9 @@ export class PartnerController {
         if (!!partner) {
             const wrongFields = await updateValidator(id, data, partnerRepository);
             if (wrongFields.length === 0) {
-                data.password = getEncryptedPassword(data.password);
+                if (!!data.password) {
+                    data.password = getEncryptedPassword(data.password);
+                }
                 await partnerRepository.update(id, data);
                 ctx.response.body = await partnerRepository.findOne({ id: id });
                 ctx.status = 200;
