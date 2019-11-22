@@ -14,6 +14,7 @@
   "author": "Mukhammed Ismailov <misterrevi4@gmail.com>",
   "dependencies": {
     "@koa/cors": "^3.0.0",
+    "async-busboy": "^0.7.0",
     "bcrypt": "^3.0.6",
     "class-validator": "^0.10.2",
     "dotenv": "^8.2.0",
@@ -25,12 +26,12 @@
     "koa-logger": "^3.2.1",
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
-    "multer": "^1.4.2",
     "pg": "^7.12.1",
     "reflect-metadata": "^0.1.13",
     "typeorm": "^0.2.20"
   },
   "devDependencies": {
+    "@types/async-busboy": "^0.7.0",
     "@types/bcrypt": "^3.0.0",
     "@types/jsonwebtoken": "^8.3.5",
     "@types/koa": "^2.0.51",

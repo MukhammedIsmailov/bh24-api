@@ -24,6 +24,6 @@ routes.get('/landing-2/:referId', LandingController.getLanding2);
 routes.get('/landing-3/:referId', LandingController.getLanding3);
 routes.get('/landing-4/:referId', LandingController.getLanding4);
 
-routes.post('/upload', body({ multipart: true }), upload);
+routes.post('/upload', upload);
 
 export default routes;

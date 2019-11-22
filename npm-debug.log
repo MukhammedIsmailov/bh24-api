@@ -26,7 +26,7 @@
 14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:251:5)
 15 verbose pkgid bh24-api@1.0.0
 16 verbose cwd /home/user/git/bh24/bh24-api
-17 error Linux 4.15.0-66-generic
+17 error Linux 4.15.0-70-generic
 18 error argv "/usr/local/bin/node" "/usr/share/npm/bin/npm-cli.js" "run" "start" "--scripts-prepend-node-path=auto"
 19 error node v10.10.0
 20 error npm  v3.5.2

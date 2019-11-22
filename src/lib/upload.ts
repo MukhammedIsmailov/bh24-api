@@ -1,19 +1,21 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { normalize } from 'path';
 import { createHash } from 'crypto';
+import * as busboy from 'async-busboy';
 
-export function upload(ctx, next) {
-    const maxSize = 10485760;
+export async function upload(ctx, next) {
     const types = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
 
-    const icon = ctx.request.files.avatar;
+    const { files } = await busboy(ctx.req);
 
-    if(icon.size <= maxSize && types.indexOf(icon.type) !== -1) {
+    const image: any = files[0];
+
+    if(types.indexOf(image.mimeType) !== -1) {
         try {
             const hash = createHash('md5').update(Math.random().toString()).digest('hex');
-            const filePath = normalize(`${__dirname}/../../data/icons/${hash}_${icon.name}`);
-            writeFileSync(filePath, readFileSync(icon.path));
-            ctx.response.body = { iconName: `${hash}_${icon.name}`};
+            const filePath = normalize(`${__dirname}/../../data/icons/${hash}_${image.filename}`);
+            writeFileSync(filePath, readFileSync(image.path));
+            ctx.response.body = { imageName: `${hash}_${image.filename}`};
             ctx.status = 201;
         }
         catch (e) {
