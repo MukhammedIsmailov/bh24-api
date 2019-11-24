@@ -1,5 +1,6 @@
 import { getManager } from 'typeorm';
 import { sign } from 'jsonwebtoken';
+import { omit } from 'lodash';
 
 import { ICreatePartner } from './DTO/ICreatePartner';
 import { IUpdatePartner } from './DTO/IUpdatePartner';
@@ -11,16 +12,29 @@ import { getConfig } from '../../config';
 
 export class PartnerController {
     static async read (ctx, next) {
-        const id = Number.parseInt(ctx.request.query.id);
+        try {
+            const id = !!ctx.request.query.id ? Number.parseInt(ctx.request.query.id) : null;
+            const referId = !!ctx.request.query.referId ? ctx.request.query.referId : null;
 
-        const partnerRepository = getManager().getRepository(PartnerEntity);
+            if (!!id || !!referId) {
+                const queryParams = !!id ? { id } : { referId };
 
-        const partner = await partnerRepository.findOne({ id: id });
-        if (!!partner) {
-            ctx.response.body = partner;
-            ctx.status = 200;
-        } else {
-            ctx.reponse.status = 404;
+                const partnerRepository = getManager().getRepository(PartnerEntity);
+
+                const partner = await partnerRepository.findOne(queryParams);
+                if (!!partner) {
+                    partner.password = '*******';
+                    ctx.response.body = partner;
+                    ctx.status = 200;
+                } else {
+                    ctx.status = 404;
+                }
+            } else {
+                ctx.status = 400;
+            }
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
         }
 
         next();
@@ -34,7 +48,11 @@ export class PartnerController {
             const wrongFields = await createValidator(data, partnerRepository);
 
             if (wrongFields.length === 0) {
-                const newPartner = await partnerRepository.create({ ...data, createdDate: new Date().toISOString() });
+                const leader = await partnerRepository.findOne({ id: data.leaderId });
+
+                const newPartner = await partnerRepository.create({
+                    ...data, createdDate: new Date().toISOString(), leader: leader
+                });
 
                 ctx.response.body = await partnerRepository.save(newPartner);
                 ctx.status = 200;

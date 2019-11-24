@@ -10,7 +10,7 @@ import { Error } from '../../lib/error';
 
 export async function createValidator(inputData: ICreatePartner, repository: Repository<PartnerEntity>) {
     const wrongFields: IValidatorResponse[] = [];
-    const fieldsForValidation = ['firstName', 'secondName', 'login'];
+    const fieldsForValidation = ['firstName', 'secondName', 'login', 'leaderId'];
 
     for (const key of fieldsForValidation) {
         const result = isEmpty(inputData[key]);
@@ -21,7 +21,13 @@ export async function createValidator(inputData: ICreatePartner, repository: Rep
     const checkLogin = await isUniqueLogin(inputData.login, repository);
 
     if (checkLogin.errorStatus) {
-        wrongFields.push({ field: 'login', error: checkLogin.error})
+        wrongFields.push({ field: 'login', error: checkLogin.error});
+    }
+
+    const checkLeader = await isValidLeader(inputData.leaderId, repository);
+
+    if (checkLeader.errorStatus) {
+        wrongFields.push({ field: 'leaderId', error: checkLeader.error});
     }
 
     return wrongFields;
@@ -85,4 +91,9 @@ function isValidPassword(password) {
     const regexp = new RegExp('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}');
     const errorStatus = password.search(regexp) !== 0;
     return <IBaseValidatorResponse> { errorStatus, error: Error.wrong };
+}
+
+async function isValidLeader(id: number, repository: Repository<PartnerEntity>) {
+    const partner = await repository.findOne({ id });
+    return <IBaseValidatorResponse> { errorStatus: !partner, error: Error.notExist };
 }

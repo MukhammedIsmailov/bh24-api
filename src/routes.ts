@@ -1,5 +1,4 @@
 import * as Router from 'koa-router';
-import * as body from 'koa-body';
 
 import { PartnerController } from './modules/partner/partner.controller';
 import { LeadController } from './modules/lead/lead.controller';

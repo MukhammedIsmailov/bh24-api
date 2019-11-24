@@ -1,4 +1,4 @@
-import { Entity , PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn} from 'typeorm';
 
 import { LeadEntity } from "../lead/lead.entity";
 
@@ -69,4 +69,11 @@ export class PartnerEntity {
 
     @OneToMany(type => LeadEntity, lead => lead.partner)
     leads: LeadEntity[];
+
+    @ManyToOne(type => PartnerEntity, partner => partner.partners)
+    @JoinColumn({ name: 'leader_id' })
+    leader: PartnerEntity;
+
+    @OneToMany(type => PartnerEntity, partner => partner.leader)
+    partners: PartnerEntity[];
 }

@@ -1,5 +1,6 @@
 export interface ICreatePartner {
     firstName: string;
-    secondNam: string;
+    secondName: string;
     login: string;
+    leaderId: number;
 }

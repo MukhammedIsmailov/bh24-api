@@ -7,11 +7,11 @@ import * as serve from 'koa-static';
 
 import { createConnection } from 'typeorm';
 
-import routes from './routes'
+import routes from './routes';
 
-import "reflect-metadata";
+import 'reflect-metadata';
 
-import { getConfig } from "./config";
+import { getConfig } from './config';
 
 createConnection().then(async connection => {
 
