@@ -11,6 +11,7 @@ export interface IUpdatePartner {
     viber: string;
     vk: string;
     whatsapp: string;
+    login: string;
     password: string;
     questionWhoAreYou: string;
     questionWhy: string;

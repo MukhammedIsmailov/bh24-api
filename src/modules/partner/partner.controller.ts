@@ -1,6 +1,5 @@
 import { getManager } from 'typeorm';
 import { sign } from 'jsonwebtoken';
-import { omit } from 'lodash';
 
 import { ICreatePartner } from './DTO/ICreatePartner';
 import { IUpdatePartner } from './DTO/IUpdatePartner';
@@ -23,7 +22,7 @@ export class PartnerController {
 
                 const partner = await partnerRepository.findOne(queryParams);
                 if (!!partner) {
-                    partner.password = '*******';
+                    partner.password = partner.password !== null ? '*******' : null;
                     ctx.response.body = partner;
                     ctx.status = 200;
                 } else {

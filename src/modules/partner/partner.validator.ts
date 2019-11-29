@@ -10,18 +10,13 @@ import { Error } from '../../lib/error';
 
 export async function createValidator(inputData: ICreatePartner, repository: Repository<PartnerEntity>) {
     const wrongFields: IValidatorResponse[] = [];
-    const fieldsForValidation = ['firstName', 'secondName', 'login', 'leaderId'];
+    const fieldsForValidation = ['firstName', 'secondName', 'leaderId'];
 
     for (const key of fieldsForValidation) {
         const result = isEmpty(inputData[key]);
         if(result.errorStatus) {
             wrongFields.push({ field: key, error: result.error });
         }
-    }
-    const checkLogin = await isUniqueLogin(inputData.login, repository);
-
-    if (checkLogin.errorStatus) {
-        wrongFields.push({ field: 'login', error: checkLogin.error});
     }
 
     const checkLeader = await isValidLeader(inputData.leaderId, repository);
@@ -35,7 +30,7 @@ export async function createValidator(inputData: ICreatePartner, repository: Rep
 
 export async function updateValidator(id: number, inputData: IUpdatePartner, repository: Repository<PartnerEntity>) {
     const wrongFields: IValidatorResponse[] = [];
-    const fieldsForValidation = ['firstName', 'secondName', 'referId', 'iconUrl', 'phoneNumber', 'email'];
+    const fieldsForValidation = ['firstName', 'secondName', 'referId', 'iconUrl', 'phoneNumber', 'email', 'login'];
 
     for (const key of fieldsForValidation) {
         const result = isEmpty(inputData[key]);
@@ -44,16 +39,19 @@ export async function updateValidator(id: number, inputData: IUpdatePartner, rep
         }
     }
 
-    const checkReferId = await isUniqueReferId(id, inputData.referId, repository);
-    if (checkReferId.errorStatus) {
-        wrongFields.push({ field: 'login', error: checkReferId.error });
+    const checkLogin = await isUniqueLogin(id, inputData.login, repository);
+    if (checkLogin.errorStatus) {
+        wrongFields.push({ field: 'login', error: checkLogin.error});
     }
 
-    if (!!inputData.password) {
-        const checkPassword = isValidPassword(inputData.password);
-        if(checkPassword.errorStatus) {
-            wrongFields.push({ field: 'password', error: checkPassword.error });
-        }
+    const checkReferId = await isUniqueReferId(id, inputData.referId, repository);
+    if (checkReferId.errorStatus) {
+        wrongFields.push({ field: 'referId', error: checkReferId.error });
+    }
+
+    const checkEmail = await isUniqueEmail(id, inputData.email, repository);
+    if (checkEmail.errorStatus) {
+        wrongFields.push({ field: 'email', error: checkEmail.error });
     }
 
     return wrongFields;
@@ -73,8 +71,15 @@ export function loginValidator(inputData: IAuthorizePartner) {
     return wrongFields;
 }
 
-async function isUniqueLogin(login: string, repository: Repository<PartnerEntity>) {
-    const count = await repository.count({ login: login });
+async function isUniqueLogin(id: number, login: string, repository: Repository<PartnerEntity>) {
+    const count = await repository.count({ login: login, id: Not(Equal(id)) });
+    const errorStatus = count > 0;
+
+    return <IBaseValidatorResponse> { errorStatus, error: Error.notUnique };
+}
+
+async function isUniqueEmail(id: number, email: string, repository: Repository<PartnerEntity>) {
+    const count = await repository.count({ email: email, id: Not(Equal(id)) });
     const errorStatus = count > 0;
 
     return <IBaseValidatorResponse> { errorStatus, error: Error.notUnique };
@@ -85,12 +90,6 @@ async function isUniqueReferId(id: number, referId: string, repository: Reposito
     const errorStatus = count > 0;
 
     return <IBaseValidatorResponse> { errorStatus, error: Error.notUnique };
-}
-
-function isValidPassword(password) {
-    const regexp = new RegExp('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}');
-    const errorStatus = password.search(regexp) !== 0;
-    return <IBaseValidatorResponse> { errorStatus, error: Error.wrong };
 }
 
 async function isValidLeader(id: number, repository: Repository<PartnerEntity>) {

@@ -48,7 +48,7 @@ export class createPartner1572336264508 implements MigrationInterface {
                     name: 'login',
                     type: 'varchar',
                     isUnique: true,
-                    isNullable: false
+                    isNullable: true
                 },
                 {
                     name: 'password',
