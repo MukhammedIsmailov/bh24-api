@@ -5,9 +5,11 @@ import { ICreatePartner } from './DTO/ICreatePartner';
 import { IUpdatePartner } from './DTO/IUpdatePartner';
 import { IAuthorizePartner } from './DTO/IAuthorizePartner';
 import { PartnerEntity } from './partner.entity';
-import { createValidator, updateValidator, loginValidator } from './partner.validator';
-import { getEncryptedPassword, comparePasswords } from './partner.service';
+import { createValidator, loginValidator, updateValidator } from './partner.validator';
+import { comparePasswords, getEncryptedPassword } from './partner.service';
 import { getConfig } from '../../config';
+import { trackEventLog } from '../event/event.service';
+import { EventLogs } from '../../lib/eventLogs';
 
 export class PartnerController {
     static async read (ctx, next) {
@@ -52,6 +54,10 @@ export class PartnerController {
                 const newPartner = await partnerRepository.create({
                     ...data, createdDate: new Date().toISOString(), leader: leader
                 });
+
+                const createdPartner = await partnerRepository.save(newPartner);
+
+                await trackEventLog(EventLogs.newPartner, { id: createdPartner.id }, leader);
 
                 ctx.response.body = await partnerRepository.save(newPartner);
                 ctx.status = 200;

@@ -27,8 +27,6 @@ export class createLead1572379189262 implements MigrationInterface {
             referencedTableName: 'partner',
             onDelete: 'CASCADE'
         }));
-
-
     }
 
     public async down(queryRunner: QueryRunner): Promise<any> {

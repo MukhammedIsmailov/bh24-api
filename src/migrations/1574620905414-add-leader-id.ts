@@ -1,6 +1,7 @@
 import {MigrationInterface, QueryRunner, TableColumn, TableForeignKey} from 'typeorm';
 
 export class addLeaderId1574620905414 implements MigrationInterface {
+
     public async up(queryRunner: QueryRunner): Promise<any> {
         await queryRunner.addColumn('partner', new TableColumn({
             name: 'leader_id',

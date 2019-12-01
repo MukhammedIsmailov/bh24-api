@@ -1,6 +1,7 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
-import { LeadEntity } from "../lead/lead.entity";
+import { LeadEntity } from '../lead/lead.entity';
+import { EventEntity } from '../event/event.entity';
 
 @Entity({ name: 'partner' })
 export class PartnerEntity {
@@ -76,4 +77,7 @@ export class PartnerEntity {
 
     @OneToMany(type => PartnerEntity, partner => partner.leader)
     partners: PartnerEntity[];
+
+    @OneToMany(type => EventEntity, event => event.partner)
+    events: EventEntity[];
 }
