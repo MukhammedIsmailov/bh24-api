@@ -4,4 +4,5 @@ export enum EventLogs {
     courseFinished = 'CF',
     feedbackButtonClick = 'FB',
     newPartner = 'NP',
+    paidAffiliate = 'PA',
 }
