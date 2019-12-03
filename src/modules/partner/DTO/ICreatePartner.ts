@@ -3,4 +3,5 @@ export interface ICreatePartner {
     secondName: string;
     login: string;
     leaderId: number;
+    ip: string;
 }

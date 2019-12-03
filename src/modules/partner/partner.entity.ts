@@ -68,6 +68,9 @@ export class PartnerEntity {
     @Column({ name: 'created_date' })
     createdDate: string;
 
+    @Column()
+    country: string;
+
     @OneToMany(type => LeadEntity, lead => lead.partner)
     leads: LeadEntity[];
 

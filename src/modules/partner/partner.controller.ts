@@ -6,7 +6,7 @@ import { IUpdatePartner } from './DTO/IUpdatePartner';
 import { IAuthorizePartner } from './DTO/IAuthorizePartner';
 import { PartnerEntity } from './partner.entity';
 import { createValidator, loginValidator, updateValidator } from './partner.validator';
-import { comparePasswords, getEncryptedPassword } from './partner.service';
+import { comparePasswords, getEncryptedPassword, getCountryCode } from './partner.service';
 import { getConfig } from '../../config';
 import { trackEventLog } from '../event/event.service';
 import { EventLogs } from '../../lib/eventLogs';
@@ -52,7 +52,7 @@ export class PartnerController {
                 const leader = await partnerRepository.findOne({ id: data.leaderId });
 
                 const newPartner = await partnerRepository.create({
-                    ...data, createdDate: new Date().toISOString(), leader: leader
+                    ...data, createdDate: new Date().toISOString(), leader: leader, country: getCountryCode(data.ip)
                 });
 
                 const createdPartner = await partnerRepository.save(newPartner);
