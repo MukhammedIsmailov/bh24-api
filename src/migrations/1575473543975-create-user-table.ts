@@ -1,10 +1,10 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import {MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey} from 'typeorm';
 
-export class createPartner1572336264508 implements MigrationInterface {
+export class createUserTable1575473543975 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<any> {
         await queryRunner.createTable(new Table({
-            name: 'partner',
+            name: 'user',
             columns: [
                 {
                     name: 'id',
@@ -16,12 +16,12 @@ export class createPartner1572336264508 implements MigrationInterface {
                 {
                     name: 'first_name',
                     type: 'varchar',
-                    isNullable: false
+                    isNullable: true
                 },
                 {
                     name: 'second_name',
                     type: 'varchar',
-                    isNullable: false
+                    isNullable: true
                 },
                 {
                     name: 'refer_id',
@@ -110,11 +110,39 @@ export class createPartner1572336264508 implements MigrationInterface {
                     type: 'text',
                     isNullable: true
                 },
+                {
+                    name: 'country',
+                    type: 'varchar',
+                    isNullable: true
+                },
+                {
+                    name: 'role',
+                    type: 'varchar',
+                    isNullable: false
+                },
+                {
+                    name: 'created_date',
+                    type: 'timestamp',
+                    isNullable: true
+                }
             ]
-        }),true)
+        }),true);
+
+        await queryRunner.addColumn('user', new TableColumn({
+            name: 'leader_id',
+            type: 'int',
+            isNullable: true
+        }));
+
+        await queryRunner.createForeignKey('user', new TableForeignKey({
+            columnNames: ['leader_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'user',
+            onDelete: 'CASCADE'
+        }));
     }
 
     public async down(queryRunner: QueryRunner): Promise<any> {
-        await queryRunner.dropTable('partner');
+        await queryRunner.dropTable('user');
     }
 }

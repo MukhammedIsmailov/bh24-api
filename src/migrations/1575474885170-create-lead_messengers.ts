@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey } from 'typeorm';
 
-export class createLeadMessengers1572791047099 implements MigrationInterface {
+export class createLeadMessengers1575474885170 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<any> {
         await queryRunner.createTable(new Table({
@@ -24,22 +24,27 @@ export class createLeadMessengers1572791047099 implements MigrationInterface {
                     isNullable: true
                 },
                 {
-                    name: 'viber_info',
-                    type: 'varchar',
+                    name: 'step',
+                    type: 'int',
+                    default: 0
+                },
+                {
+                    name: 'last_send_time',
+                    type: 'timestamp',
                     isNullable: true
                 }
             ]
         }), true);
 
         await queryRunner.addColumn('lead_messengers', new TableColumn({
-            name: 'lead_id',
+            name: 'user_id',
             type: 'int'
         }));
 
         await queryRunner.createForeignKey('lead_messengers', new TableForeignKey({
-            columnNames: ['lead_id'],
+            columnNames: ['user_id'],
             referencedColumnNames: ['id'],
-            referencedTableName: 'lead',
+            referencedTableName: 'user',
             onDelete: 'CASCADE'
         }));
     }

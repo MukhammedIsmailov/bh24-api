@@ -1,6 +1,6 @@
-import {MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey} from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey } from 'typeorm';
 
-export class createEvents1575009630887 implements MigrationInterface {
+export class createEventTable1575474436067 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<any> {
         await queryRunner.createTable(new Table({
@@ -33,14 +33,26 @@ export class createEvents1575009630887 implements MigrationInterface {
         }),true);
 
         await queryRunner.addColumn('event', new TableColumn({
-            name: 'partner_id',
+            name: 'user_id',
             type: 'int'
         }));
 
         await queryRunner.createForeignKey('event', new TableForeignKey({
-            columnNames: ['partner_id'],
+            columnNames: ['user_id'],
             referencedColumnNames: ['id'],
-            referencedTableName: 'partner',
+            referencedTableName: 'user',
+            onDelete: 'CASCADE'
+        }));
+
+        await queryRunner.addColumn('event', new TableColumn({
+            name: 'leader_id',
+            type: 'int'
+        }));
+
+        await queryRunner.createForeignKey('event', new TableForeignKey({
+            columnNames: ['leader_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'user',
             onDelete: 'CASCADE'
         }));
     }
