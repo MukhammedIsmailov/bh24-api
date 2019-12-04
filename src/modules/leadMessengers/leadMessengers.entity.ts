@@ -1,7 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import {IsDate, IsInt, IsPositive} from 'class-validator';
 
-import { LeadEntity } from '../lead/lead.entity';
+import { UserEntity } from '../user/user.entity';
 
 @Entity({ name: 'lead_messengers' })
 export class LeadMessengersEntity {
@@ -14,19 +13,13 @@ export class LeadMessengersEntity {
     @Column({ name: 'facebook_info', default: null })
     facebookInfo: string;
 
-    @Column({ name: 'viber_info', default: null })
-    viberInfo: string;
-
-    @IsInt()
-    @IsPositive()
     @Column({ name: 'step' })
     step: number;
 
     @Column({ name: 'last_send_time' })
-    @IsDate()
     lastSendTime: string;
 
-    @ManyToOne(type => LeadEntity, lead => lead.messengers)
-    @JoinColumn({ name: 'lead_id' })
-    lead: LeadEntity;
+    @ManyToOne(type => UserEntity, user => user.messengers)
+    @JoinColumn({ name: 'user_id' })
+    user: UserEntity;
 }

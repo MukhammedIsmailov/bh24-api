@@ -2,7 +2,6 @@ import * as Router from 'koa-router';
 
 import { PartnerController } from './modules/partner/partner.controller';
 import { LeadController } from './modules/lead/lead.controller';
-import { LandingController } from './modules/landing/landing.controller';
 import { LeadMessengersController } from './modules/leadMessengers/leadMessengers.controller';
 import { EventController } from './modules/event/event.controller';
 import { StatisticsController } from './modules/statistics/statistics.controller';
@@ -24,11 +23,6 @@ routes.post('/lead/messenger', LeadMessengersController.update);
 routes.put('/event/landing-visit', EventController.landingVisitLogCreate);
 
 routes.get('/statistics/plot', StatisticsController.statisticsForPlotRead);
-
-routes.get('/landing-1/:referId', LandingController.getLanding1);
-routes.get('/landing-2/:referId', LandingController.getLanding2);
-routes.get('/landing-3/:referId', LandingController.getLanding3);
-routes.get('/landing-4/:referId', LandingController.getLanding4);
 
 routes.post('/upload', upload);
 

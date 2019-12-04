@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 
-import { PartnerEntity } from '../partner/partner.entity';
+import { UserEntity } from '../user/user.entity';
 
 @Entity({ name: 'event' })
 export class EventEntity {
@@ -16,7 +16,11 @@ export class EventEntity {
     @Column({ name: 'payload_data' })
     payloadData: string;
 
-    @ManyToOne(type => PartnerEntity, partner => partner.events)
-    @JoinColumn({ name: 'partner_id' })
-    partner: PartnerEntity;
+    @ManyToOne(type => UserEntity, user => user.events)
+    @JoinColumn({ name: 'user_id' })
+    user: UserEntity;
+
+    @ManyToOne(type => UserEntity, user => user.events)
+    @JoinColumn({ name: 'leader_id' })
+    leader: UserEntity;
 }
