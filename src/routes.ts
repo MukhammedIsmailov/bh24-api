@@ -1,6 +1,6 @@
 import * as Router from 'koa-router';
 
-import { PartnerController } from './modules/partner/partner.controller';
+import { UserController } from './modules/user/user.controller';
 import { LeadController } from './modules/lead/lead.controller';
 import { LeadMessengersController } from './modules/leadMessengers/leadMessengers.controller';
 import { EventController } from './modules/event/event.controller';
@@ -10,10 +10,11 @@ import { StatisticsController } from './modules/statistics/statistics.controller
 import { upload } from './lib/upload';
 
 const routes = new Router({ prefix: '/api' });
-routes.post('/login', PartnerController.authorize);
-routes.get('/partner', PartnerController.read);
-routes.put('/partner', PartnerController.create);
-routes.post('/partner', PartnerController.update);
+routes.post('/login', UserController.authorize);
+
+routes.get('/partner', UserController.partnerRead);
+routes.put('/partner', UserController.partnerCreate);
+routes.post('/partner', UserController.partnerUpdate);
 
 routes.put('/lead', LeadController.create);
 
