@@ -16,9 +16,9 @@ export class EventEntity {
     @Column({ name: 'payload_data' })
     payloadData: string;
 
-    @ManyToOne(type => UserEntity, user => user.events)
-    @JoinColumn({ name: 'user_id' })
-    user: UserEntity;
+    // @ManyToOne(type => UserEntity, user => user.events)
+    // @JoinColumn({ name: 'user_id' })
+    // user: UserEntity;
 
     @ManyToOne(type => UserEntity, user => user.events)
     @JoinColumn({ name: 'leader_id' })

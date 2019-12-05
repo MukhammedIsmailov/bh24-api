@@ -6,10 +6,9 @@ import { LeadMessengersEntity } from './leadMessengers.entity';
 export async function createNewLeadMessengerItem(data, lead): Promise<any> {
     const leadMessengersRepository = getManager().getRepository(LeadMessengersEntity);
     const newLeadMessengers = await leadMessengersRepository.create({
-        lead: lead,
+        user: lead,
         telegramInfo: (data.messengerInfo.messenger === Messenger.Telegram) ? data.messengerInfo.info : null,
         facebookInfo: (data.messengerInfo.messenger === Messenger.Facebook) ? data.messengerInfo.info : null,
-        viberInfo: (data.messengerInfo.messenger === Messenger.Viber) ? data.messengerInfo.info : null,
         step: data.messengerInfo.step,
         lastSendTime: new Date().toISOString(),
     });

@@ -1,17 +1,17 @@
 import { getManager } from 'typeorm';
 
-import { PartnerEntity } from '../partner/partner.entity';
+import { UserEntity } from '../user/user.entity';
 import { EventLogs } from '../../lib/eventLogs';
 import { EventEntity } from './event.entity';
 
-export async function trackEventLog (eventLog: EventLogs, payloadData: any, partner: PartnerEntity) {
+export async function trackEventLog (eventLog: EventLogs, payloadData: any, leader: UserEntity) {
     const eventRepository = getManager().getRepository(EventEntity);
 
     const newLog = await eventRepository.create({
-        eventLog,
-        payloadData: !!payloadData ? JSON.stringify(payloadData) : '{}',
+        eventLog: eventLog,
         createdDate: new Date().toISOString(),
-        partner
+        payloadData: !!payloadData ? JSON.stringify(payloadData) : '"{}"',
+        leader: leader,
     });
 
     await eventRepository.save(newLog);

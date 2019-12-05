@@ -1,7 +1,6 @@
 import * as Router from 'koa-router';
 
 import { UserController } from './modules/user/user.controller';
-import { LeadController } from './modules/lead/lead.controller';
 import { LeadMessengersController } from './modules/leadMessengers/leadMessengers.controller';
 import { EventController } from './modules/event/event.controller';
 import { StatisticsController } from './modules/statistics/statistics.controller';
@@ -16,7 +15,7 @@ routes.get('/partner', UserController.partnerRead);
 routes.put('/partner', UserController.partnerCreate);
 routes.post('/partner', UserController.partnerUpdate);
 
-routes.put('/lead', LeadController.create);
+routes.put('/lead', UserController.leadCreate);
 
 routes.get('/lead/messenger/all', LeadMessengersController.readAll);
 routes.post('/lead/messenger', LeadMessengersController.update);

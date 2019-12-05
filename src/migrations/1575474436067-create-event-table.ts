@@ -32,17 +32,17 @@ export class createEventTable1575474436067 implements MigrationInterface {
             ]
         }),true);
 
-        await queryRunner.addColumn('event', new TableColumn({
-            name: 'user_id',
-            type: 'int'
-        }));
-
-        await queryRunner.createForeignKey('event', new TableForeignKey({
-            columnNames: ['user_id'],
-            referencedColumnNames: ['id'],
-            referencedTableName: 'user',
-            onDelete: 'CASCADE'
-        }));
+        // await queryRunner.addColumn('event', new TableColumn({
+        //     name: 'user_id',
+        //     type: 'int'
+        // }));
+        //
+        // await queryRunner.createForeignKey('event', new TableForeignKey({
+        //     columnNames: ['user_id'],
+        //     referencedColumnNames: ['id'],
+        //     referencedTableName: 'user',
+        //     onDelete: 'CASCADE'
+        // }));
 
         await queryRunner.addColumn('event', new TableColumn({
             name: 'leader_id',

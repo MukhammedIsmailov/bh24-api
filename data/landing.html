@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Be Happy 24</title>
+</head>
+<body>
+    <button onclick="telegramClick()">Telegram</button>
+</body>
+<script>
+    (() => {
+        fetch('http://localhost:3000/api/event/landing-visit', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({
+                referId: 'behappy24'
+            })
+        });
+    })();
+
+    async function telegramClick() {
+        location.replace(`https://t.me/behappy_test_bot?start=behappy24`);
+    }
+</script>
+</html>

@@ -81,9 +81,9 @@ export class UserEntity {
     @JoinColumn({ name: 'leader_id' })
     leader: UserEntity;
 
-    @OneToMany(type => EventEntity, event => event.user)
+    @OneToMany(type => EventEntity, event => event.leader)
     events: EventEntity[];
 
-    @OneToMany(type => EventEntity, event => event.user)
+    @OneToMany(type => LeadMessengersEntity, leadMessengers => leadMessengers.user)
     messengers: LeadMessengersEntity[];
 }

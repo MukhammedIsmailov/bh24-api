@@ -9,7 +9,9 @@ import { EventLogs } from '../../lib/eventLogs';
 import { ICreatePartner } from './DTO/ICreatePartner';
 import { IUpdatePartner } from './DTO/IUpdatePartner';
 import { IAuthorizePartner } from './DTO/IAuthorizePartner';
+import { ICreateLead } from './DTO/ICreateLead';
 import { getConfig } from '../../config';
+import { createNewLeadMessengerItem } from '../leadMessengers/leadMessenger.sevice';
 
 export class UserController {
     static async partnerRead (ctx, next) {
@@ -137,5 +139,36 @@ export class UserController {
         }
 
         next();
+    }
+
+    static async leadCreate (ctx, next) {
+        try {
+            const data: ICreateLead = ctx.request.body;
+
+            if (!!data.referId) {
+                const userRepository = getManager().getRepository(UserEntity);
+
+                const leader = await userRepository.findOne({ where: { referId: data.referId } });
+                if (!!leader){
+                    const newLead = await userRepository.create({
+                        role: 'lead',
+                        firstName: !!data.messengerInfo.first_name ? data.messengerInfo.first_name : data.messengerInfo.username,
+                        secondName: !!data.messengerInfo.second_name ? data.messengerInfo.second_name : data.messengerInfo.messenger,
+                        createdDate: new Date().toISOString(),
+                        leader: leader
+                    });
+                    const savedLead = await userRepository.save(newLead);
+                    await createNewLeadMessengerItem(data, savedLead);
+                    await trackEventLog(EventLogs.courseSubscription, null, leader);
+                        ctx.status = 200;
+                    } else {
+                        ctx.status = 404;
+                    }
+            }
+
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
     }
 }
