@@ -154,6 +154,7 @@ export class UserController {
                         role: 'lead',
                         firstName: !!data.messengerInfo.first_name ? data.messengerInfo.first_name : data.messengerInfo.username,
                         secondName: !!data.messengerInfo.second_name ? data.messengerInfo.second_name : data.messengerInfo.messenger,
+                        country: data.country,
                         createdDate: new Date().toISOString(),
                         leader: leader
                     });

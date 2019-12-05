@@ -2,6 +2,6 @@ import { IMessengerInfo } from '../../leadMessengers/DTO/IMessengerInfo';
 
 export interface ICreateLead {
     referId: string;
-    type: string;
+    country: string;
     messengerInfo: IMessengerInfo
 }

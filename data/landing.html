@@ -8,7 +8,7 @@
     <button onclick="telegramClick()">Telegram</button>
 </body>
 <script>
-    (() => {
+    (async () => {
         fetch('http://localhost:3000/api/event/landing-visit', {
             method: 'PUT',
             headers: {
@@ -21,7 +21,9 @@
     })();
 
     async function telegramClick() {
-        location.replace(`https://t.me/behappy_test_bot?start=behappy24`);
+        const countryResult = await fetch('http://ip-api.com/json');
+        const result = await countryResult.json();
+        location.replace(`https://t.me/behappy_test_bot?start=behappy24_AND_${result.countryCode}`);
     }
 </script>
 </html>
