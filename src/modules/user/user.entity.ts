@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColum
 
 import { EventEntity } from '../event/event.entity';
 import { LeadMessengersEntity } from '../leadMessengers/leadMessengers.entity';
+import { LessonEventEntity } from '../lessonEvent/lessonEvent.entity'
 
 @Entity({ name: 'user' })
 export class UserEntity {
@@ -86,4 +87,7 @@ export class UserEntity {
 
     @OneToMany(type => LeadMessengersEntity, leadMessengers => leadMessengers.user)
     messengers: LeadMessengersEntity[];
+
+    @OneToMany(type => LessonEventEntity, lessonEvents => lessonEvents.lead)
+    lessonEvents: LessonEventEntity[];
 }

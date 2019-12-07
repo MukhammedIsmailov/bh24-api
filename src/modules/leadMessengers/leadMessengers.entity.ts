@@ -19,6 +19,9 @@ export class LeadMessengersEntity {
     @Column({ name: 'last_send_time' })
     lastSendTime: string;
 
+    @Column({ name: 'from' })
+    from: string;
+
     @ManyToOne(type => UserEntity, user => user.messengers)
     @JoinColumn({ name: 'user_id' })
     user: UserEntity;

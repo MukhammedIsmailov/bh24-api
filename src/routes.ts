@@ -4,6 +4,7 @@ import { UserController } from './modules/user/user.controller';
 import { LeadMessengersController } from './modules/leadMessengers/leadMessengers.controller';
 import { EventController } from './modules/event/event.controller';
 import { StatisticsController } from './modules/statistics/statistics.controller';
+import { LessonEventController } from './modules/lessonEvent/lessonEvent.controller';
 
 // import { verifyToken } from './lib/jwt';
 import { upload } from './lib/upload';
@@ -24,6 +25,8 @@ routes.put('/event/landing-visit', EventController.landingVisitLogCreate);
 routes.put('/event/course-finished', EventController.courseFinishedLogCreate);
 
 routes.get('/statistics/plot', StatisticsController.statisticsForPlotRead);
+
+routes.put('/lesson-event', LessonEventController.lessonEventLogCreate);
 
 routes.post('/upload', upload);
 

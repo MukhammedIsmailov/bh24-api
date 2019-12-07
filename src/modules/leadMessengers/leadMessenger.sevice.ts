@@ -11,6 +11,7 @@ export async function createNewLeadMessengerItem(data, lead): Promise<any> {
         facebookInfo: (data.messengerInfo.messenger === Messenger.Facebook) ? data.messengerInfo.info : null,
         step: data.messengerInfo.step,
         lastSendTime: new Date().toISOString(),
+        from: data.messengerInfo.messenger,
     });
 
     return leadMessengersRepository.save(newLeadMessengers);

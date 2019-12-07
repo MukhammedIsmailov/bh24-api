@@ -87,9 +87,15 @@ export class StatisticsController {
 
             ctx.status = 200;
 
+            next();
+
         } catch (e) {
             console.log(e);
             ctx.status = 500;
         }
+    }
+
+    static async statisticsForWardsRead (ctx, next) {
+
     }
 }

@@ -164,6 +164,9 @@ export class UserController {
                     await createNewLeadMessengerItem(data, savedLead);
                     await trackEventLog(EventLogs.courseSubscription, null, leader);
                     await trackEventLog(EventLogs.newLead, null, leader);
+                        ctx.response.body = {
+                            id: savedLead.id,
+                        };
                         ctx.status = 200;
                     } else {
                         ctx.status = 404;
