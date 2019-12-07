@@ -21,6 +21,7 @@ routes.get('/lead/messenger/all', LeadMessengersController.readAll);
 routes.post('/lead/messenger', LeadMessengersController.update);
 
 routes.put('/event/landing-visit', EventController.landingVisitLogCreate);
+routes.put('/event/course-finished', EventController.courseFinishedLogCreate);
 
 routes.get('/statistics/plot', StatisticsController.statisticsForPlotRead);
 

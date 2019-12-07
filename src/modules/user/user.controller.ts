@@ -46,26 +46,28 @@ export class UserController {
     static async partnerCreate (ctx, next) {
         try {
             const data: ICreatePartner = ctx.request.body;
+            const userId: number = parseInt(ctx.request.query.id);
             const userRepository = getManager().getRepository(UserEntity);
+            const partner = await userRepository.findOne({ id: userId });
+            if (!!partner) {
+                const wrongFields = await createValidator(data, userRepository);
+                if (wrongFields.length === 0) {
+                    const leader = await userRepository.findOne({ id: data.leaderId });
+                    const {
+                        leaderId, ...payloadData } = data;
 
-            const wrongFields = await createValidator(data, userRepository);
+                    await userRepository.update(userId, { ...payloadData, role: 'partner' });
 
-            if (wrongFields.length === 0) {
-                const leader = await userRepository.findOne({ id: data.leaderId });
+                    await trackEventLog(EventLogs.newPartner, { id: partner.id }, leader);
 
-                const newPartner = await userRepository.create({
-                    ...data, createdDate: new Date().toISOString(), leader: leader, country: getCountryCode(data.ip)
-                });
-
-                const createdPartner = await userRepository.save(newPartner);
-
-                await trackEventLog(EventLogs.newPartner, { id: createdPartner.id }, leader);
-
-                ctx.response.body = await userRepository.save(newPartner);
-                ctx.status = 200;
+                    ctx.response.body = await userRepository.findOne({ id: userId });
+                    ctx.status = 200;
+                } else {
+                    ctx.status = 400;
+                    ctx.response.body = wrongFields;
+                }
             } else {
-                ctx.status = 400;
-                ctx.response.body = wrongFields;
+                ctx.status = 404;
             }
         } catch (e) {
             ctx.status = 500;
@@ -161,6 +163,7 @@ export class UserController {
                     const savedLead = await userRepository.save(newLead);
                     await createNewLeadMessengerItem(data, savedLead);
                     await trackEventLog(EventLogs.courseSubscription, null, leader);
+                    await trackEventLog(EventLogs.newLead, null, leader);
                         ctx.status = 200;
                     } else {
                         ctx.status = 404;
@@ -171,5 +174,7 @@ export class UserController {
             console.log(e);
             ctx.status = 500;
         }
+        
+        next();
     }
 }
