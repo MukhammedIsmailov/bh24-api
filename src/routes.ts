@@ -28,6 +28,9 @@ routes.get('/statistics/plot', StatisticsController.statisticsForPlotRead);
 
 routes.put('/lesson-event', LessonEventController.lessonEventLogCreate);
 
+routes.post('/ward', UserController.wardUpdate);
+routes.post('/wards', UserController.wardRead);
+
 routes.post('/upload', upload);
 
 export default routes;

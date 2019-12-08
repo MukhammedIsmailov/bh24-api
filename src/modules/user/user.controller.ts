@@ -3,13 +3,15 @@ import { sign } from 'jsonwebtoken';
 
 import { UserEntity } from './user.entity';
 import { createValidator, loginValidator, updateValidator } from './user.validator';
-import { comparePasswords, getCountryCode, getEncryptedPassword } from './user.service';
+import { comparePasswords, getEncryptedPassword } from './user.service';
 import { trackEventLog } from '../event/event.service';
 import { EventLogs } from '../../lib/eventLogs';
 import { ICreatePartner } from './DTO/ICreatePartner';
 import { IUpdatePartner } from './DTO/IUpdatePartner';
 import { IAuthorizePartner } from './DTO/IAuthorizePartner';
 import { ICreateLead } from './DTO/ICreateLead';
+import { IUpdateWard  } from './DTO/IUpdateWard';
+import { IReadWard  } from './DTO/IReadWard';
 import { getConfig } from '../../config';
 import { createNewLeadMessengerItem } from '../leadMessengers/leadMessenger.sevice';
 
@@ -26,8 +28,9 @@ export class UserController {
 
                 const partner = await userRepository.findOne(queryParams);
                 if (!!partner) {
-                    partner.password = partner.password !== null ? '*******' : null;
-                    ctx.response.body = partner;
+                    const { note, status, country, role,  ...payloadData } = partner;
+                    payloadData.password = payloadData.password !== null ? '*******' : null;
+                    ctx.response.body = payloadData;
                     ctx.status = 200;
                 } else {
                     ctx.status = 404;
@@ -53,14 +56,17 @@ export class UserController {
                 const wrongFields = await createValidator(data, userRepository);
                 if (wrongFields.length === 0) {
                     const leader = await userRepository.findOne({ id: data.leaderId });
-                    const {
-                        leaderId, ...payloadData } = data;
+                    const { leaderId, ...payloadData } = data;
 
                     await userRepository.update(userId, { ...payloadData, role: 'partner' });
 
                     await trackEventLog(EventLogs.newPartner, { id: partner.id }, leader);
 
-                    ctx.response.body = await userRepository.findOne({ id: userId });
+                    const createdPartner = await userRepository.findOne({ id: userId });
+
+                    const { note, status, country, role,  ...responseData } = createdPartner;
+
+                    ctx.response.body = responseData;
                     ctx.status = 200;
                 } else {
                     ctx.status = 400;
@@ -92,7 +98,11 @@ export class UserController {
                         data.password = getEncryptedPassword(data.password);
                     }
                     await userRepository.update(id, data);
-                    ctx.response.body = await userRepository.findOne({ id: id });
+                    const updatedPartner = await userRepository.findOne({ id: id });
+
+                    const { note, status, country, role,  ...responseData } = updatedPartner;
+
+                    ctx.response.body = responseData;
                     ctx.status = 200;
                 } else {
                     ctx.response.body = wrongFields;
@@ -178,6 +188,61 @@ export class UserController {
             ctx.status = 500;
         }
         
+        next();
+    }
+
+    static async wardUpdate (ctx, next) {
+        try {
+            const data: IUpdateWard = ctx.request.body;
+            const id = Number.parseInt(ctx.request.query.id);
+            if (!!data.note || !!data.status) {
+                const userRepository = getManager().getRepository(UserEntity);
+
+                const partner = await userRepository.findOne({ id: id });
+                if (!!partner) {
+                    await userRepository.update(id, data);
+                    const updatedWard = await userRepository.findOne({ id: id },
+                        { select: ['id', 'status', 'note'] });
+                    ctx.response.body =  updatedWard;
+                    ctx.status = 200;
+                } else {
+                    ctx.status = 404;
+                }
+            } else {
+                ctx.status = 400;
+            }
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+
+        next();
+    }
+
+    static async wardRead (ctx, next) {
+        try {
+            const data: IReadWard = ctx.request.body;
+
+            const messengerSubquery = !!data.messengerFilter ? ` AND "from" = '${data.messengerFilter}'` : '';
+            const lessonSubquery = !!data.lessonFilter ? ` AND step = ${data.lessonFilter}` : '';
+            const statusSubquery = !!data.statusFilter ? ` AND status = '${data.statusFilter}'`: '';
+            const dateSubquery = !!data.startDateFilter && !!data.endDateFilter ?
+                ` AND created_date > '${data.startDateFilter}' AND created_date < '${data.endDateFilter}'` : '';
+
+            const query = `SELECT "user".id, first_name, second_name, icon_url, country, note, status, "from", step, 
+                           "user".created_date, phone_number, last_send_time FROM "user" LEFT JOIN lead_messengers ON 
+                           "user".id = lead_messengers.user_id WHERE leader_id = 1 ${messengerSubquery + lessonSubquery
+                           + statusSubquery + dateSubquery};`;
+
+            const result = await getManager().query(query);
+            console.log(result);
+            ctx.response.body = result;
+            ctx.status = 200;
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+
         next();
     }
 }

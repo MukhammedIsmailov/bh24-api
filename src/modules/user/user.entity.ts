@@ -90,4 +90,10 @@ export class UserEntity {
 
     @OneToMany(type => LessonEventEntity, lessonEvents => lessonEvents.lead)
     lessonEvents: LessonEventEntity[];
+
+    @Column()
+    note: string;
+
+    @Column()
+    status: string;
 }
