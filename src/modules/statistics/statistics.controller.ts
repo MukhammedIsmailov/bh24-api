@@ -94,8 +94,4 @@ export class StatisticsController {
             ctx.status = 500;
         }
     }
-
-    static async statisticsForWardsRead (ctx, next) {
-
-    }
 }

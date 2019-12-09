@@ -27,6 +27,7 @@ routes.put('/event/course-finished', EventController.courseFinishedLogCreate);
 routes.get('/statistics/plot', StatisticsController.statisticsForPlotRead);
 
 routes.put('/lesson-event', LessonEventController.lessonEventLogCreate);
+routes.get('/lesson-events', LessonEventController.lessonEventsRead);
 
 routes.post('/ward', UserController.wardUpdate);
 routes.post('/wards', UserController.wardRead);

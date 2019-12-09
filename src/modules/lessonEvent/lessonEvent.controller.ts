@@ -38,4 +38,33 @@ export class LessonEventController {
 
         next();
     }
+
+    static async lessonEventsRead (ctx, next) {
+        try {
+            const id = Number.parseInt(ctx.request.query.id);
+
+            if(!Number.isNaN(id)) {
+                const userRepository = getManager().getRepository(UserEntity);
+                const lessonEventRepository = getManager().getRepository(LessonEventEntity);
+
+                const user = await userRepository.findOne({ where: { id: id } });
+                if (!!user) {
+                    ctx.response.body = await lessonEventRepository.find({
+                        where: { lead: user },
+                        select: ['lessonNumber', 'readingDate']
+                    });
+                    ctx.status = 200;
+                } else {
+                    ctx.status = 404;
+                }
+            } else {
+                ctx.status = 400;
+            }
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+
+        next();
+    }
 }
