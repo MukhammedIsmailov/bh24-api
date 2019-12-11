@@ -235,7 +235,6 @@ export class UserController {
                            + statusSubquery + dateSubquery};`;
 
             const result = await getManager().query(query);
-            console.log(result);
             ctx.response.body = result;
             ctx.status = 200;
         } catch (e) {

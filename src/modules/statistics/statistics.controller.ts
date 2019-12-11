@@ -49,8 +49,8 @@ export class StatisticsController {
             const countOfCourseFinished = !!countOfCourseFinishedRAW ? parseInt(countOfCourseFinishedRAW['count']) : 0;
             const countOfCourseSubscription = !!countOfCourseSubscriptionRAW ? parseInt(countOfCourseSubscriptionRAW['count']) : 0;
 
-            const paymentEfficiency = !!countOfTransitions && !!countOfPayments ?  countOfPayments / countOfTransitions * 100 : 0;
-            const courseEfficiency = !!countOfCourseFinished && !!countOfCourseSubscription ?  countOfCourseFinished / countOfCourseSubscription * 100 : 0;
+            const paymentEfficiency = !!countOfTransitions && !!countOfPayments ? Math.round(countOfPayments / countOfTransitions * 100): 0;
+            const courseEfficiency = !!countOfCourseFinished && !!countOfCourseSubscription ? Math.round(countOfCourseFinished / countOfCourseSubscription * 100) : 0;
 
             const counts = [];
             const total = parseInt(totalCount[0]['count']);

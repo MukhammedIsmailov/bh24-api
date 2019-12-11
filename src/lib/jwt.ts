@@ -18,17 +18,14 @@ export async function verifyToken (ctx, next) {
         verify(token, jwtSecretKey, async function (err, decoded) {
             if (err) {
                 ctx.status = 401;
-                console.log('1')
             } else {
                 const partnerRepository = getManager().getRepository(PartnerEntity);
                 ctx.currentPartner = await partnerRepository.findOne({ id: decoded.id });
                 ctx.token = token;
-                console.log('2')
                 next();
             }
         });
     } else {
-        console.log('3');
         ctx.status = 401;
     }
 }
