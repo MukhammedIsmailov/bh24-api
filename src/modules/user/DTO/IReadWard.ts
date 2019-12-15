@@ -1,7 +1,9 @@
 export interface IReadWard {
     messengerFilter?: string;
-    lessonFilter?: number;
+    lessonFilter?: string;
     statusFilter?: string;
     startDateFilter?: string;
     endDateFilter?: string;
+    leadFilter: boolean;
+    partnerFilter: boolean;
 }

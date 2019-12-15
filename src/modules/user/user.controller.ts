@@ -1,5 +1,6 @@
 import { getManager } from 'typeorm';
 import { sign } from 'jsonwebtoken';
+import * as moment from 'moment';
 
 import { UserEntity } from './user.entity';
 import { createValidator, loginValidator, updateValidator } from './user.validator';
@@ -223,16 +224,25 @@ export class UserController {
         try {
             const data: IReadWard = ctx.request.body;
 
-            const messengerSubquery = !!data.messengerFilter ? ` AND "from" = '${data.messengerFilter}'` : '';
-            const lessonSubquery = !!data.lessonFilter ? ` AND step = ${data.lessonFilter}` : '';
-            const statusSubquery = !!data.statusFilter ? ` AND status = '${data.statusFilter}'`: '';
-            const dateSubquery = !!data.startDateFilter && !!data.endDateFilter ?
-                ` AND created_date > '${data.startDateFilter}' AND created_date < '${data.endDateFilter}'` : '';
+            const psqlDateFormat = 'YYYY-MM-DD HH:mm:ss';
+
+            const endDateTime = moment.unix(parseInt(data.endDateFilter, 10)).utc();
+            const startDateTime = moment.unix(parseInt(data.startDateFilter, 10)).utc();
+
+            const startDate = startDateTime.format(psqlDateFormat);
+            const endDate = endDateTime.format(psqlDateFormat);
+
+            const messengerSubquery = !!data.messengerFilter && data.messengerFilter !== "null" ? ` AND "from" = '${data.messengerFilter}'` : '';
+            const lessonSubquery = !!data.lessonFilter && data.lessonFilter !== "null" ? ` AND step = ${data.lessonFilter}` : '';
+            const statusSubquery = !!data.statusFilter  && data.statusFilter !== "null" ? ` AND status = '${data.statusFilter}'`: '';
+            const dateSubquery = ` AND created_date > '${startDate}' AND created_date < '${endDate}'`;
+            const leadSubquery = data.leadFilter === false ? ` AND role != 'lead'` : '';
+            const partnerSubquery = data.partnerFilter === false ? ` AND role != 'partner'` : '';
 
             const query = `SELECT "user".id, first_name, second_name, icon_url, country, note, status, "from", step, 
                            "user".created_date, phone_number, last_send_time FROM "user" LEFT JOIN lead_messengers ON 
                            "user".id = lead_messengers.user_id WHERE leader_id = 1 ${messengerSubquery + lessonSubquery
-                           + statusSubquery + dateSubquery};`;
+                           + statusSubquery + dateSubquery + leadSubquery + partnerSubquery};`;
 
             const result = await getManager().query(query);
             ctx.response.body = result;

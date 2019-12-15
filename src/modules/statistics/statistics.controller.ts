@@ -4,6 +4,7 @@ import * as moment from 'moment';
 import { EventEntity } from '../event/event.entity';
 import { IStatisticsForPlotRequest } from './DTO/IStatisticsForPlot';
 import { EventLogs } from '../../lib/eventLogs';
+import { plotDataGenerate } from './statistics.service';
 
 export class StatisticsController {
     static async statisticsForPlotRead (ctx, next) {
@@ -33,10 +34,6 @@ export class StatisticsController {
             const countsForCourseEfficiency = await eventRepository.query(`SELECT count(id), event_log FROM event 
                 WHERE event_log = '${EventLogs.courseSubscription}' OR event_log = '${EventLogs.courseFinished}' GROUP BY event_log;`);
 
-            const dataForPlot = await eventRepository.query(`SELECT to_char(date_trunc('day', created_date),
-                'DD MON YY') AS date, count(1), event_log FROM event WHERE created_date > '${startDate}'
-                AND created_date < '${endDate}' GROUP BY 1, event_log;`);
-
             const countOfCourseFinishedRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseFinished });
             const countOfCourseSubscriptionRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseSubscription });
 
@@ -54,25 +51,26 @@ export class StatisticsController {
 
             const counts = [];
             const total = parseInt(totalCount[0]['count']);
-            const plotData = [];
+
+            const firstParam = moment().diff(endDate, 'days');
+            const secondParam = firstParam + endDateTime.diff(startDateTime, 'days');
+            const dataForPlotQueries = eventTypes.map((type: string) => {
+                return eventRepository.query(`WITH d AS (SELECT to_char(date_trunc('day', (current_date - offs)), 'DD MON YY') AS date
+                        FROM generate_series(${firstParam}, ${secondParam}, 1) AS offs)
+                        SELECT d.date, count(CASE WHEN event_log = '${type}' THEN 1 END)
+                        FROM d LEFT JOIN event ON d.date = to_char(date_trunc('day', event.created_date), 'DD MON YY')
+                        GROUP BY d.date ORDER BY to_timestamp(d.date, 'DD MON YY');`);
+            });
+            const dataForPlot = await Promise.all((dataForPlotQueries));
+
+            const plotData = plotDataGenerate(dataForPlot, eventTypes);
 
             for (const type of eventTypes) {
-                plotData.push({ [type ]: []});
                 counts.push({ [type]: 0 });
                 for (const item of countsData) {
                     if (type === item['event_log']) {
                         counts[counts.length - 1][type] = parseInt(item['count']);
                         break;
-                    }
-                }
-
-                for (const item of dataForPlot) {
-                    if (type === item['event_log']) {
-                        plotData[plotData.length - 1][type].push({
-                            date: item['date'],
-                            count: item['count'],
-                            timestamp: parseInt(moment.utc(item['date'], 'DD MMM YY').format('X')),
-                        });
                     }
                 }
             }
