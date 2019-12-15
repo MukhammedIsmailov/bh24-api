@@ -13,6 +13,7 @@ import { IAuthorizePartner } from './DTO/IAuthorizePartner';
 import { ICreateLead } from './DTO/ICreateLead';
 import { IUpdateWard  } from './DTO/IUpdateWard';
 import { IReadWard  } from './DTO/IReadWard';
+import { IReadLeads  } from './DTO/IReadLeads';
 import { getConfig } from '../../config';
 import { createNewLeadMessengerItem } from '../leadMessengers/leadMessenger.sevice';
 
@@ -252,6 +253,31 @@ export class UserController {
             ctx.status = 500;
         }
 
+        next();
+    }
+
+    static async leadsRead (ctx, next) {
+        try {
+            const leaderId = Number.parseInt(ctx.request.query.id);
+
+            const query = `SELECT "user".first_name, "user".second_name, "user".id, "leader".refer_id 
+                              FROM "user" AS leader 
+                              INNER JOIN "user" AS "user" ON "leader".id = "user".leader_id 
+                           WHERE leader.id = ${leaderId} AND "user".role = 'lead';`;
+
+            const leadsData = await getManager().query(query);
+            const leads: IReadLeads[] = leadsData.map(lead => {
+                return {
+                    fullName: `${lead.second_name} ${lead.first_name}`,
+                    urlForCreate: `/?referId=${lead.refer_id}&userId=${lead.id}`,
+                }
+            });
+
+            ctx.response.body = leads;
+        } catch (e) {
+            ctx.status = 500;
+            console.log(e);
+        }
         next();
     }
 }

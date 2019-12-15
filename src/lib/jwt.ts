@@ -2,7 +2,7 @@ import { verify } from 'jsonwebtoken';
 import { getManager } from 'typeorm';
 
 import { getConfig } from '../config';
-import { PartnerEntity } from '../modules/partner/partner.entity';
+import { UserEntity } from '../modules/user/user.entity';
 
 export async function verifyToken (ctx, next) {
     const { jwtSecretKey } = getConfig();
@@ -15,17 +15,18 @@ export async function verifyToken (ctx, next) {
     }
 
     if (token) {
-        verify(token, jwtSecretKey, async function (err, decoded) {
-            if (err) {
-                ctx.status = 401;
-            } else {
-                const partnerRepository = getManager().getRepository(PartnerEntity);
-                ctx.currentPartner = await partnerRepository.findOne({ id: decoded.id });
-                ctx.token = token;
-                next();
-            }
-        });
+        try {
+            const decoded: any = verify(token, jwtSecretKey);
+            const partnerRepository = await getManager().getRepository(UserEntity);
+            ctx.currentParnter = await partnerRepository.findOne({ where: { id: decoded.id }, select: ['id', 'role', 'referId'] });
+            await next();
+        } catch (e) {
+            console.log(e);
+            ctx.throw(401);
+            await next();
+        }
     } else {
-        ctx.status = 401;
+        ctx.throw(401);
+        await next();
     }
 }

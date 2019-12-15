@@ -24,6 +24,16 @@ createConnection().then(async connection => {
     app.use(cors());
     app.use(serve('./data'));
 
+    app.use( async(ctx, next) => {
+        try {
+            await next();
+        } catch (e) {
+            ctx.status = e.status || 500;
+            ctx.body = e.message;
+            ctx.app.emit('error', e, ctx);
+        }
+    });
+
     app.use(routes.routes()).use(routes.allowedMethods());
 
     app.listen(port, () => {

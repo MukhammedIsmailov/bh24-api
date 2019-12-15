@@ -24,15 +24,18 @@ export class StatisticsController {
             const eventRepository = getManager().getRepository(EventEntity);
 
             const countsData = await eventRepository.query(`SELECT count(id), event_log FROM event
-                WHERE created_date > '${startDate}' AND created_date < '${endDate}' GROUP BY event_log;`);
+                WHERE created_date > '${startDate}' AND created_date < '${endDate}' AND leader_id = ${ctx.currentParnter.id} 
+                GROUP BY event_log;`);
 
-            const totalCount = await eventRepository.query('SELECT count(id) FROM event;');
+            const totalCount = await eventRepository.query(`SELECT count(id) FROM event WHERE leader_id = ${ctx.currentParnter.id};`);
 
             const countsForPaymentEfficiency = await eventRepository.query(`SELECT count(id), event_log FROM event 
-                WHERE event_log = '${EventLogs.landingVisit}' OR event_log = '${EventLogs.paidAffiliate}' GROUP BY event_log;`);
+                WHERE event_log = '${EventLogs.landingVisit}' OR event_log = '${EventLogs.paidAffiliate}' AND leader_id = ${ctx.currentParnter.id}
+                GROUP BY event_log;`);
 
             const countsForCourseEfficiency = await eventRepository.query(`SELECT count(id), event_log FROM event 
-                WHERE event_log = '${EventLogs.courseSubscription}' OR event_log = '${EventLogs.courseFinished}' GROUP BY event_log;`);
+                WHERE event_log = '${EventLogs.courseSubscription}' OR event_log = '${EventLogs.courseFinished}' AND leader_id = ${ctx.currentParnter.id}
+                GROUP BY event_log;`);
 
             const countOfCourseFinishedRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseFinished });
             const countOfCourseSubscriptionRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseSubscription });
@@ -57,7 +60,7 @@ export class StatisticsController {
             const dataForPlotQueries = eventTypes.map((type: string) => {
                 return eventRepository.query(`WITH d AS (SELECT to_char(date_trunc('day', (current_date - offs)), 'DD MON YY') AS date
                         FROM generate_series(${firstParam}, ${secondParam}, 1) AS offs)
-                        SELECT d.date, count(CASE WHEN event_log = '${type}' THEN 1 END)
+                        SELECT d.date, count(CASE WHEN event_log = '${type}' AND leader_id = ${ctx.currentParnter.id} THEN 1 END)
                         FROM d LEFT JOIN event ON d.date = to_char(date_trunc('day', event.created_date), 'DD MON YY')
                         GROUP BY d.date ORDER BY to_timestamp(d.date, 'DD MON YY');`);
             });
