@@ -20,13 +20,12 @@ routes.put('/event/landing-visit', EventController.landingVisitLogCreate);
 routes.put('/event/course-finished', EventController.courseFinishedLogCreate);
 routes.put('/lesson-event', LessonEventController.lessonEventLogCreate);
 
-// routes.use(verifyToken);
-routes.post('/partner', UserController.partnerUpdate);
-routes.get('/leads', UserController.leadsRead);
+routes.post('/partner', verifyToken, UserController.partnerUpdate);
+routes.get('/leads', verifyToken, UserController.leadsRead);
 routes.get('/statistics/plot', verifyToken, StatisticsController.statisticsForPlotRead);
-routes.get('/lesson-events', LessonEventController.lessonEventsRead);
-routes.post('/ward', UserController.wardUpdate);
-routes.post('/wards', UserController.wardRead);
-routes.post('/upload', upload);
+routes.get('/lesson-events', verifyToken, LessonEventController.lessonEventsRead);
+routes.post('/ward', verifyToken, UserController.wardUpdate);
+routes.post('/wards', verifyToken, UserController.wardRead);
+routes.post('/upload', verifyToken, upload);
 
 export default routes;

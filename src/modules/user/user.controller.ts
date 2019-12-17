@@ -88,7 +88,7 @@ export class UserController {
     static async partnerUpdate (ctx, next) {
         try {
             const data: IUpdatePartner = ctx.request.body;
-            const id = Number.parseInt(ctx.request.query.id);
+            const id = ctx.currentParnter.id;
 
             const userRepository = getManager().getRepository(UserEntity);
 
@@ -224,6 +224,7 @@ export class UserController {
     static async wardRead (ctx, next) {
         try {
             const data: IReadWard = ctx.request.body;
+            const leaderId = ctx.currentParnter.id;
 
             const psqlDateFormat = 'YYYY-MM-DD HH:mm:ss';
 
@@ -242,7 +243,7 @@ export class UserController {
 
             const query = `SELECT "user".id, first_name, second_name, icon_url, country, note, status, "from", step, 
                            "user".created_date, phone_number, last_send_time FROM "user" LEFT JOIN lead_messengers ON 
-                           "user".id = lead_messengers.user_id WHERE leader_id = 1 ${messengerSubquery + lessonSubquery
+                           "user".id = lead_messengers.user_id WHERE leader_id = ${leaderId + messengerSubquery + lessonSubquery
                            + statusSubquery + dateSubquery + leadSubquery + partnerSubquery};`;
 
             const result = await getManager().query(query);
@@ -258,7 +259,7 @@ export class UserController {
 
     static async leadsRead (ctx, next) {
         try {
-            const leaderId = Number.parseInt(ctx.request.query.id);
+            const leaderId = ctx.currentParnter.id;
 
             const query = `SELECT "user".first_name, "user".second_name, "user".id, "leader".refer_id 
                               FROM "user" AS leader 
