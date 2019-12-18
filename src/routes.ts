@@ -10,22 +10,34 @@ import { verifyToken } from './lib/jwt';
 import { upload } from './lib/upload';
 
 const routes = new Router({ prefix: '/api' });
+
+// for system
 routes.post('/login', UserController.authorize);
-routes.get('/partner', UserController.partnerRead);
-routes.put('/partner', UserController.partnerCreate);
+routes.put('/partner', verifyToken, UserController.partnerCreate);
+routes.get('/partner/byId', UserController.partnerReadById);
+routes.get('/partner/byReferId', UserController.partnerReadByReferId);
+routes.post('/partner', UserController.partnerUpdate);
+routes.post('/upload', verifyToken, upload);
+routes.post('/ward', verifyToken, UserController.wardUpdate);
+routes.post('/wards', verifyToken, UserController.wardRead);
+routes.get('/statistics/plot', verifyToken, StatisticsController.statisticsForPlotRead);
+routes.get('/lesson-events', verifyToken, LessonEventController.lessonEventsRead);
+routes.get('/leads', verifyToken, UserController.leadsRead);
+
+// for landing
+routes.put('/event/landing-visit', EventController.landingVisitLogCreate);
+
+// for chat-bots
 routes.put('/lead', UserController.leadCreate);
 routes.get('/lead/messenger/all', LeadMessengersController.readAll);
 routes.post('/lead/messenger', LeadMessengersController.update);
-routes.put('/event/landing-visit', EventController.landingVisitLogCreate);
 routes.put('/event/course-finished', EventController.courseFinishedLogCreate);
 routes.put('/lesson-event', LessonEventController.lessonEventLogCreate);
 
-routes.post('/partner', verifyToken, UserController.partnerUpdate);
-routes.get('/leads', verifyToken, UserController.leadsRead);
-routes.get('/statistics/plot', verifyToken, StatisticsController.statisticsForPlotRead);
-routes.get('/lesson-events', verifyToken, LessonEventController.lessonEventsRead);
-routes.post('/ward', verifyToken, UserController.wardUpdate);
-routes.post('/wards', verifyToken, UserController.wardRead);
-routes.post('/upload', verifyToken, upload);
+
+
+
+
+
 
 export default routes;

@@ -18,21 +18,42 @@ import { getConfig } from '../../config';
 import { createNewLeadMessengerItem } from '../leadMessengers/leadMessenger.sevice';
 
 export class UserController {
-    static async partnerRead (ctx, next) {
+    static async partnerReadById (ctx, next) {
         try {
             const id = !!ctx.request.query.id ? Number.parseInt(ctx.request.query.id) : null;
-            const referId = !!ctx.request.query.referId ? ctx.request.query.referId : null;
 
-            if (!!id || !!referId) {
-                const queryParams = !!id ? { id } : { referId };
-
+            if (!!id) {
                 const userRepository = getManager().getRepository(UserEntity);
-
-                const partner = await userRepository.findOne(queryParams);
+                const partner = await userRepository.findOne({ where: { id: id }});
                 if (!!partner) {
                     const { note, status, country, role,  ...payloadData } = partner;
                     payloadData.password = payloadData.password !== null ? '*******' : null;
                     ctx.response.body = payloadData;
+                    ctx.status = 200;
+                } else {
+                    ctx.status = 404;
+                }
+            } else {
+                ctx.status = 400;
+            }
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+
+        next();
+    }
+
+    static async partnerReadByReferId (ctx, next) {
+        try {
+            const referId = ctx.request.query.referId;
+
+            if (!!referId) {
+                const userRepository = getManager().getRepository(UserEntity);
+
+                const partner = await userRepository.findOne({ where: { referId: referId }, select: ['iconUrl', 'firstName', 'secondName', 'id'] });
+                if (!!partner) {
+                    ctx.response.body = partner;
                     ctx.status = 200;
                 } else {
                     ctx.status = 404;
@@ -88,7 +109,7 @@ export class UserController {
     static async partnerUpdate (ctx, next) {
         try {
             const data: IUpdatePartner = ctx.request.body;
-            const id = ctx.currentParnter.id;
+            const id = Number.parseInt(ctx.request.query.id);
 
             const userRepository = getManager().getRepository(UserEntity);
 

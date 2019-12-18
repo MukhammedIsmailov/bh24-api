@@ -30,7 +30,7 @@ export async function createValidator(inputData: ICreatePartner, repository: Rep
 
 export async function updateValidator(id: number, inputData: IUpdatePartner, repository: Repository<UserEntity>) {
     const wrongFields: IValidatorResponse[] = [];
-    const fieldsForValidation = ['firstName', 'secondName', 'referId', 'iconUrl', 'phoneNumber', 'email', 'login'];
+    const fieldsForValidation = ['firstName', 'secondName', 'iconUrl', 'phoneNumber', 'email', 'login'];
 
     for (const key of fieldsForValidation) {
         const result = isEmpty(inputData[key]);
@@ -42,11 +42,6 @@ export async function updateValidator(id: number, inputData: IUpdatePartner, rep
     const checkLogin = await isUniqueLogin(id, inputData.login, repository);
     if (checkLogin.errorStatus) {
         wrongFields.push({ field: 'login', error: checkLogin.error});
-    }
-
-    const checkReferId = await isUniqueReferId(id, inputData.referId, repository);
-    if (checkReferId.errorStatus) {
-        wrongFields.push({ field: 'referId', error: checkReferId.error });
     }
 
     const checkEmail = await isUniqueEmail(id, inputData.email, repository);
