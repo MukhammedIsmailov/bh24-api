@@ -12,12 +12,13 @@ import { upload } from './lib/upload';
 const routes = new Router({ prefix: '/api' });
 
 // for system
+routes.get('/me',verifyToken, UserController.me);
 routes.post('/login', UserController.authorize);
-routes.put('/partner', verifyToken, UserController.partnerCreate);
+routes.put('/partner', UserController.partnerCreate);
 routes.get('/partner/byId', UserController.partnerReadById);
 routes.get('/partner/byReferId', UserController.partnerReadByReferId);
 routes.post('/partner', UserController.partnerUpdate);
-routes.post('/upload', verifyToken, upload);
+routes.post('/upload', upload);
 routes.post('/ward', verifyToken, UserController.wardUpdate);
 routes.post('/wards', verifyToken, UserController.wardRead);
 routes.get('/statistics/plot', verifyToken, StatisticsController.statisticsForPlotRead);

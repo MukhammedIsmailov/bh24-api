@@ -18,6 +18,20 @@ import { getConfig } from '../../config';
 import { createNewLeadMessengerItem } from '../leadMessengers/leadMessenger.sevice';
 
 export class UserController {
+    static async me (ctx, next) {
+        try {
+            const userRepository = getManager().getRepository(UserEntity);
+            const id = ctx.currentParnter.id;
+            ctx.body = await userRepository.findOne({ id: id },
+                { select: ['firstName', 'secondName', 'iconUrl', 'login'] });
+            ctx.status = 200;
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+        await next();
+    }
+
     static async partnerReadById (ctx, next) {
         try {
             const id = !!ctx.request.query.id ? Number.parseInt(ctx.request.query.id) : null;
@@ -124,6 +138,7 @@ export class UserController {
                     const updatedPartner = await userRepository.findOne({ id: id });
 
                     const { note, status, country, role,  ...responseData } = updatedPartner;
+                    responseData.password = responseData.password !== null ? '*******' : null;
 
                     ctx.response.body = responseData;
                     ctx.status = 200;
@@ -151,14 +166,19 @@ export class UserController {
             const wrongFields = loginValidator(data);
 
             if (wrongFields.length === 0) {
-                const partner = await userRepository.findOne( { login: data.login });
+                const partner = await userRepository.findOne( {
+                    where: [
+                        { login: data.login },
+                        { email: data.login }
+                    ]
+                });
                 if (partner) {
                     if (comparePasswords(partner.password, data.password)) {
                         const config = getConfig();
                         const token = sign({id: partner.id }, config.jwtSecretKey, {
                             expiresIn: config.jwtTokenExpireInMinutes
                         });
-                        ctx.response.body = { token };
+                        ctx.response.body = { token, userId: partner.id, referId: partner.referId };
                         return ctx.status = 200;
                     }
                 } else {
@@ -261,11 +281,14 @@ export class UserController {
             const dateSubquery = ` AND created_date > '${startDate}' AND created_date < '${endDate}'`;
             const leadSubquery = data.leadFilter === false ? ` AND role != 'lead'` : '';
             const partnerSubquery = data.partnerFilter === false ? ` AND role != 'partner'` : '';
+            const searchSubquery = !!data.searchFilter ? ` AND (position(LOWER(first_name) in '${data.searchFilter.toLocaleLowerCase()}') > 0
+                                                           OR  (position(LOWER(second_name) in '${data.searchFilter.toLocaleLowerCase()}') > 0
+                                                           OR  (position(LOWER(login) in '${data.searchFilter.toLocaleLowerCase()}') > 0)))` : '';
 
             const query = `SELECT "user".id, first_name, second_name, icon_url, country, note, status, "from", step, 
                            "user".created_date, phone_number, last_send_time FROM "user" LEFT JOIN lead_messengers ON 
                            "user".id = lead_messengers.user_id WHERE leader_id = ${leaderId + messengerSubquery + lessonSubquery
-                           + statusSubquery + dateSubquery + leadSubquery + partnerSubquery};`;
+                           + statusSubquery + dateSubquery + leadSubquery + partnerSubquery + searchSubquery};`;
 
             const result = await getManager().query(query);
             ctx.response.body = result;
@@ -291,7 +314,7 @@ export class UserController {
             const leads: IReadLeads[] = leadsData.map(lead => {
                 return {
                     fullName: `${lead.second_name} ${lead.first_name}`,
-                    urlForCreate: `/?referId=${lead.refer_id}&userId=${lead.id}`,
+                    urlForCreate: `?referId=${lead.refer_id}&userId=${lead.id}`,
                 }
             });
 

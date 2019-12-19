@@ -2,6 +2,7 @@ export interface IUpdatePartner {
     firstName: string;
     secondName: string;
     iconUrl: string;
+    referId: string;
     phoneNumber: string;
     email: string;
     facebook: string;

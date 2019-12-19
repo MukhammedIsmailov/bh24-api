@@ -6,4 +6,5 @@ export interface IReadWard {
     endDateFilter?: string;
     leadFilter: boolean;
     partnerFilter: boolean;
+    searchFilter?: string;
 }
