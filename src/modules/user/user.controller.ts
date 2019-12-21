@@ -4,7 +4,7 @@ import * as moment from 'moment';
 
 import { UserEntity } from './user.entity';
 import { createValidator, loginValidator, updateValidator } from './user.validator';
-import { comparePasswords, getEncryptedPassword } from './user.service';
+import { comparePasswords, getEncryptedPassword, getCountryCode } from './user.service';
 import { trackEventLog } from '../event/event.service';
 import { EventLogs } from '../../lib/eventLogs';
 import { ICreatePartner } from './DTO/ICreatePartner';
@@ -22,8 +22,28 @@ export class UserController {
         try {
             const userRepository = getManager().getRepository(UserEntity);
             const id = ctx.currentParnter.id;
-            ctx.body = await userRepository.findOne({ id: id },
-                { select: ['firstName', 'secondName', 'iconUrl', 'login'] });
+            const query = `SELECT "user".first_name   AS "firstName",
+                               "user".second_name  AS "secondName",
+                               "user".login,
+                               "user".icon_url     AS "iconUrl",
+                               "user".leader_id,
+                               leader.first_name   AS "leaderFirstName",
+                               leader.second_name  AS "leaderSecondName",
+                               leader.icon_url     AS "leaderIconUrl",
+                               leader.login        AS "leaderLogin",
+                               leader.phone_number AS "leaderPhoneNumber",
+                               leader.email        AS "leaderEmail",
+                               leader.facebook,
+                               leader.telegram,
+                               leader.skype,
+                               leader.vk,
+                               leader.viber,
+                               leader.whatsapp
+                            FROM "user"
+                                LEFT JOIN "user" AS leader on "user".leader_id = leader."id"
+                            WHERE "user".id = ${id};`;
+            const user = await userRepository.query(query);
+            ctx.body = user[0];
             ctx.status = 200;
         } catch (e) {
             console.log(e);
@@ -86,31 +106,26 @@ export class UserController {
     static async partnerCreate (ctx, next) {
         try {
             const data: ICreatePartner = ctx.request.body;
-            const userId: number = parseInt(ctx.request.query.id);
+            console.log(data)
             const userRepository = getManager().getRepository(UserEntity);
-            const partner = await userRepository.findOne({ id: userId });
-            if (!!partner) {
-                const wrongFields = await createValidator(data, userRepository);
-                if (wrongFields.length === 0) {
-                    const leader = await userRepository.findOne({ id: data.leaderId });
-                    const { leaderId, ...payloadData } = data;
+            const wrongFields = await createValidator(data, userRepository);
+            if (wrongFields.length === 0) {
+                const leader = await userRepository.findOne({ id: data.leaderId });
 
-                    await userRepository.update(userId, { ...payloadData, role: 'partner' });
+                //todo country from ip
+                const newPartner = await userRepository.create({
+                    ...data, createdDate: new Date().toISOString(), role: 'partner', leader: leader, country: getCountryCode(data.ip),
+                });
+                const createdPartner = await userRepository.save(newPartner);
+                await trackEventLog(EventLogs.newPartner, null, leader);
 
-                    await trackEventLog(EventLogs.newPartner, { id: partner.id }, leader);
+                const { note, status, country, role,   ...responseData } = createdPartner;
 
-                    const createdPartner = await userRepository.findOne({ id: userId });
-
-                    const { note, status, country, role,  ...responseData } = createdPartner;
-
-                    ctx.response.body = responseData;
-                    ctx.status = 200;
-                } else {
-                    ctx.status = 400;
-                    ctx.response.body = wrongFields;
-                }
+                ctx.response.body = responseData;
+                ctx.status = 200;
             } else {
-                ctx.status = 404;
+                ctx.status = 400;
+                ctx.response.body = wrongFields;
             }
         } catch (e) {
             ctx.status = 500;
