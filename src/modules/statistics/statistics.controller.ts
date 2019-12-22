@@ -7,7 +7,7 @@ import { EventLogs } from '../../lib/eventLogs';
 import { plotDataGenerate } from './statistics.service';
 
 export class StatisticsController {
-    static async statisticsForPlotRead (ctx, next) {
+    static async statisticsRead (ctx, next) {
         const data = <IStatisticsForPlotRequest>ctx.request.query;
 
         const psqlDateFormat = 'YYYY-MM-DD HH:mm:ss';
@@ -88,11 +88,35 @@ export class StatisticsController {
 
             ctx.status = 200;
 
-            next();
-
         } catch (e) {
             console.log(e);
             ctx.status = 500;
         }
+
+        next();
+    }
+
+    static async latestRegistrationsRead (ctx, next) {
+        try {
+            const leaderId = ctx.currentParnter.id;
+            const startDate = moment().subtract(1, 'months').toISOString();
+            const query = `SELECT first_name   AS "firstName",
+                              second_name  AS "secondName",
+                              icon_url     AS "iconUrl",
+                              country,
+                              created_date AS "createdDate"
+                              FROM "user"
+                              WHERE leader_id = ${leaderId}
+                                AND created_date BETWEEN '${startDate}' AND now()
+                                AND role = 'partner';`;
+
+            ctx.response.body = await getManager().query(query);
+            ctx.status = 200;
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+
+        next();
     }
 }

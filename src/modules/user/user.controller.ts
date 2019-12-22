@@ -112,7 +112,6 @@ export class UserController {
             if (wrongFields.length === 0) {
                 const leader = await userRepository.findOne({ id: data.leaderId });
 
-                //todo country from ip
                 const newPartner = await userRepository.create({
                     ...data, createdDate: new Date().toISOString(), role: 'partner', leader: leader, country: getCountryCode(data.ip),
                 });

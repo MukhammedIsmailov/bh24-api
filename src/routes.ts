@@ -21,9 +21,10 @@ routes.post('/partner', UserController.partnerUpdate);
 routes.post('/upload', upload);
 routes.post('/ward', verifyToken, UserController.wardUpdate);
 routes.post('/wards', verifyToken, UserController.wardRead);
-routes.get('/statistics/plot', verifyToken, StatisticsController.statisticsForPlotRead);
+routes.get('/statistics', verifyToken, StatisticsController.statisticsRead);
 routes.get('/lesson-events', verifyToken, LessonEventController.lessonEventsRead);
 routes.get('/leads', verifyToken, UserController.leadsRead);
+routes.get('/latest-registrations', verifyToken, StatisticsController.latestRegistrationsRead);
 
 // for landing
 routes.put('/event/landing-visit', EventController.landingVisitLogCreate);
