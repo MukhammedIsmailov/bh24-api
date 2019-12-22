@@ -16,3 +16,9 @@ export async function createNewLeadMessengerItem(data, lead): Promise<any> {
 
     return leadMessengersRepository.save(newLeadMessengers);
 }
+
+export async function updateLeadMessengerItem(data): Promise<void> {
+    const leadMessengersRepository = getManager().getRepository(LeadMessengersEntity);
+    const query = `UPDATE lead_messengers SET last_send_time = now(), step = ${data.step} WHERE user_id = ${data.id};`;
+    await leadMessengersRepository.query(query);
+}
