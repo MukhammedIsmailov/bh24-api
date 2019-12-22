@@ -56,4 +56,54 @@ export class EventController {
         }
         next();
     }
+
+    static async feedbackButtonClickLogCreate (ctx, next) {
+        const data: ICourseFinishedLog = ctx.request.body;
+
+        if (!!data.userId) {
+            try {
+                const userRepository = getManager().getRepository(UserEntity);
+
+                const user = await userRepository.findOne({where: { id: data.userId }, relations: ['leader']});
+
+                if (!!user && !!user.leader) {
+                    await trackEventLog(EventLogs.feedbackButtonClick, { userId: data.userId }, user.leader);
+                    ctx.status = 200;
+                } else {
+                    ctx.status = 404;
+                }
+            } catch (e) {
+                console.log(e);
+                ctx.status = 500;
+            }
+        } else {
+            ctx.status = 400;
+        }
+        next();
+    }
+
+    static async contactsSeeEventLog (ctx, next) {
+        const data: ICourseFinishedLog = ctx.request.body;
+
+        if (!!data.userId) {
+            try {
+                const userRepository = getManager().getRepository(UserEntity);
+
+                const user = await userRepository.findOne({where: { id: data.userId }, relations: ['leader']});
+
+                if (!!user && !!user.leader) {
+                    await trackEventLog(EventLogs.contactsSee, { userId: data.userId }, user.leader);
+                    ctx.status = 200;
+                } else {
+                    ctx.status = 404;
+                }
+            } catch (e) {
+                console.log(e);
+                ctx.status = 500;
+            }
+        } else {
+            ctx.status = 400;
+        }
+        next();
+    }
 }

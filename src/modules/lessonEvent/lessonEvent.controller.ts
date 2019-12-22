@@ -3,30 +3,44 @@ import { getManager } from 'typeorm';
 import { ILessonEventLogCreate } from './DTO/ILessonEventLogCreate';
 import { LessonEventEntity } from './lessonEvent.entity'
 import { UserEntity } from '../user/user.entity';
+import { updateLeadMessengerItem } from '../leadMessengers/leadMessenger.sevice';
 
 export class LessonEventController {
     static async lessonEventLogCreate (ctx, next) {
         try {
             const data: ILessonEventLogCreate = ctx.request.body;
+            let lastStep = 0;
 
             if (!!data.id && !!data.step) {
                 const userRepository = getManager().getRepository(UserEntity);
                 const lessonEventRepository = getManager().getRepository(LessonEventEntity);
 
-                const lead = await userRepository.findOne( { where: { id: data.id }});
+                if (!!data.extern) {
+                    lastStep = await getManager()
+                        .query(`SELECT max(lesson_number) from lesson_event WHERE lead_id = ${data.id};`);
+                    lastStep = lastStep[0].max;
+                }
+                if (!data.extern || (!!data.extern && lastStep < data.step)) {
+                    const lead = await userRepository.findOne( { where: { id: data.id }});
 
-                if (!!lead) {
-                    const newLog = await lessonEventRepository.create({
-                        lessonNumber: data.step,
-                        createdDate: new Date().toISOString(),
-                        lead: lead
-                    });
+                    if (!!lead) {
+                        const newLog = await lessonEventRepository.create({
+                            lessonNumber: data.step,
+                            createdDate: new Date().toISOString(),
+                            lead: lead
+                        });
 
-                    await lessonEventRepository.save(newLog);
+                        await lessonEventRepository.save(newLog);
 
-                    ctx.status = 200;
+                        if (!!data.extern) {
+                            await updateLeadMessengerItem(data);
+                        }
+                        ctx.status = 200;
+                    } else {
+                        ctx.status = 404;
+                    }
                 } else {
-                    ctx.status = 404;
+                    ctx.status = 200;
                 }
             } else {
                 ctx.status = 400;

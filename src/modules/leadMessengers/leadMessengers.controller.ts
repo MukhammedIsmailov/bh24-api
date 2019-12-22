@@ -1,5 +1,6 @@
 import { getManager } from 'typeorm';
-import { LeadMessengersEntity } from './leadMessengers.entity';
+
+import { updateLeadMessengerItem } from './leadMessenger.sevice';
 
 export class LeadMessengersController {
         static async readAll (ctx, next) {
@@ -13,15 +14,13 @@ export class LeadMessengersController {
     }
 
     static async update (ctx, next) {
-        const leadMessengersRepository = getManager().getRepository(LeadMessengersEntity);
-        const requestParams = ctx.request.body;
-        const leadMessengerToUpdate = await leadMessengersRepository.findOne(requestParams.id);
-        leadMessengerToUpdate.step = requestParams.step;
-        leadMessengerToUpdate.lastSendTime = new Date().toISOString();
-        await leadMessengersRepository.save(leadMessengerToUpdate);
-
-        ctx.status = 200;
-
+       try {
+           await updateLeadMessengerItem(ctx.request.body);
+           ctx.status = 200;
+       } catch (e) {
+           console.log(e);
+           ctx.status = 500;
+       }
         await next();
     }
 }

@@ -22,7 +22,8 @@ export class UserController {
         try {
             const userRepository = getManager().getRepository(UserEntity);
             const id = ctx.currentParnter.id;
-            const query = `SELECT "user".first_name   AS "firstName",
+            const query = `SELECT
+                               "user".first_name   AS "firstName",
                                "user".second_name  AS "secondName",
                                "user".login,
                                "user".icon_url     AS "iconUrl",
@@ -336,6 +337,39 @@ export class UserController {
         } catch (e) {
             ctx.status = 500;
             console.log(e);
+        }
+        next();
+    }
+
+    static async leaderReadByUserId (ctx, next) {
+        try {
+            const userId = parseInt(ctx.request.query.userId);
+            if (!!userId) {
+                const query = `SELECT "user".leader_id    AS "leaderId",
+                               leader.first_name   AS "firstName",
+                               leader.second_name  AS "secondName",
+                               leader.email,
+                               leader.phone_number AS "phoneNumber",
+                               leader.telegram,
+                               leader.facebook,
+                               leader.viber,
+                               leader.vk,
+                               leader.whatsapp,
+                               leader.skype,
+                               leader.icon_url     AS "iconUrl",
+                               leader.login
+                        FROM "user"
+                        INNER JOIN "user" AS leader ON "user".leader_id = leader.id
+                        WHERE "user".id = ${userId};`;
+                const leader = await getManager().query(query);
+                ctx.response.body = leader[0];
+                ctx.status = 200;
+            } else {
+                ctx.status = 400;
+            }
+        } catch (e) {
+           console.log(e);
+           ctx.status = 500;
         }
         next();
     }

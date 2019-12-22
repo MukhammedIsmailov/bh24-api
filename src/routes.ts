@@ -5,6 +5,7 @@ import { LeadMessengersController } from './modules/leadMessengers/leadMessenger
 import { EventController } from './modules/event/event.controller';
 import { StatisticsController } from './modules/statistics/statistics.controller';
 import { LessonEventController } from './modules/lessonEvent/lessonEvent.controller';
+import { LessonController } from './modules/lesson/lesson.controller';
 
 import { verifyToken } from './lib/jwt';
 import { upload } from './lib/upload';
@@ -25,6 +26,10 @@ routes.get('/statistics', verifyToken, StatisticsController.statisticsRead);
 routes.get('/lesson-events', verifyToken, LessonEventController.lessonEventsRead);
 routes.get('/leads', verifyToken, UserController.leadsRead);
 routes.get('/latest-registrations', verifyToken, StatisticsController.latestRegistrationsRead);
+routes.get('/lesson', LessonController.lessonRead);
+routes.get('/partner/byUserId', UserController.leaderReadByUserId);
+routes.put('/event/feedback-button-click', EventController.feedbackButtonClickLogCreate);
+routes.put('/event/contacts-see', EventController.contactsSeeEventLog);
 
 // for landing
 routes.put('/event/landing-visit', EventController.landingVisitLogCreate);
@@ -35,11 +40,5 @@ routes.get('/lead/messenger/all', LeadMessengersController.readAll);
 routes.post('/lead/messenger', LeadMessengersController.update);
 routes.put('/event/course-finished', EventController.courseFinishedLogCreate);
 routes.put('/lesson-event', LessonEventController.lessonEventLogCreate);
-
-
-
-
-
-
 
 export default routes;

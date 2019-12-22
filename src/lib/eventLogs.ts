@@ -6,4 +6,5 @@ export enum EventLogs {
     newPartner = 'NP',
     newLead = 'NL',
     paidAffiliate = 'PA',
+    contactsSee = 'CS',
 }
