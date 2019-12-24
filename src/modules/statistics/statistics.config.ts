@@ -49,6 +49,9 @@ const statisticsConfig = {
     },
     PA: {
         showLine: false,
+    },
+    CS: {
+        showLine: false,
     }
 };
 

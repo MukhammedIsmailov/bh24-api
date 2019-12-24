@@ -357,7 +357,8 @@ export class UserController {
                                leader.whatsapp,
                                leader.skype,
                                leader.icon_url     AS "iconUrl",
-                               leader.login
+                               leader.login,
+                               leader.question_who_are_you as "leaderDescription"
                         FROM "user"
                         INNER JOIN "user" AS leader ON "user".leader_id = leader.id
                         WHERE "user".id = ${userId};`;
