@@ -297,21 +297,27 @@ export class UserController {
             const leadSubquery = data.leadFilter === false ? ` AND role != 'lead'` : '';
             const partnerSubquery = data.partnerFilter === false ? ` AND role != 'partner'` : '';
             const feedbackSubquery = data.feedbackFilter === false ? ` AND feedback > 0` : '';
+            const contactsSubquery = data.contactsFilter === false ? ` AND contacts > 0` : '';
+            const lessonFinishSubquery = data.lessonFinishFilter === false ? ` AND max_lesson_number != 4` : '';
             const searchSubquery = !!data.searchFilter ? ` AND (position(LOWER(first_name) in '${data.searchFilter.toLocaleLowerCase()}') > 0
                                                            OR  (position(LOWER(second_name) in '${data.searchFilter.toLocaleLowerCase()}') > 0
                                                            OR  (position(LOWER(login) in '${data.searchFilter.toLocaleLowerCase()}') > 0)))` : '';
 
-            const query = `SELECT "user".id, first_name, second_name, icon_url, country, note, status, "from", step,
-                                  "user".created_date, phone_number, last_send_time, username, feedback
+            const query = `SELECT DISTINCT "user".id, first_name, second_name, icon_url, country, note, status, "from", step,
+                                  "user".created_date, phone_number, last_send_time, username, feedback, contacts, max_lesson_number
                             FROM "user"
                                 LEFT JOIN lead_messengers ON "user".id = lead_messengers.user_id
                                 LEFT JOIN event ON "user".id = event.lead_id
-                                LEFT JOIN (SELECT count(id) AS feedback, event.lead_id
-                                            FROM event WHERE event.leader_id = 1 AND event_log = '${EventLogs.feedbackButtonClick}'
-                                            GROUP BY event.lead_id) AS eventCount ON "user".id = event.lead_id
+                                LEFT JOIN (SELECT count(CASE WHEN event_log = '${EventLogs.feedbackButtonClick}' THEN 1 ELSE NULL END) AS feedback, 
+                                                  count(CASE WHEN event_log = '${EventLogs.contactsSee}' THEN 1 ELSE NULL END) AS contacts, event.lead_id
+                                            FROM event WHERE event.leader_id = ${leaderId}
+                                            GROUP BY event.lead_id) AS eventCount ON "user".id = eventCount.lead_id
+                                LEFT JOIN (SELECT max(lesson_number) AS max_lesson_number, lesson_event.lead_id 
+                                            FROM lesson_event 
+                                            GROUP BY lesson_event.lead_id) AS lessonEvent ON "user".id = lessonEvent.lead_id                                            
                             WHERE "user".leader_id = ${leaderId + messengerSubquery + lessonSubquery
                                                 + statusSubquery + dateSubquery + leadSubquery + partnerSubquery + 
-                                                  searchSubquery + feedbackSubquery};`;
+                                                  searchSubquery + feedbackSubquery + contactsSubquery + lessonFinishSubquery}`;
 
             const result = await getManager().query(query);
             ctx.response.body = result;

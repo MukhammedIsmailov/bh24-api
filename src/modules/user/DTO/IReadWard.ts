@@ -8,4 +8,6 @@ export interface IReadWard {
     partnerFilter: boolean;
     searchFilter?: string;
     feedbackFilter: boolean;
+    contactsFilter: boolean;
+    lessonFinishFilter: boolean;
 }

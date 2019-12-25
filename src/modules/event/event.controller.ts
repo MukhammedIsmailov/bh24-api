@@ -67,7 +67,7 @@ export class EventController {
                 const user = await userRepository.findOne({where: { id: data.userId }, relations: ['leader']});
 
                 if (!!user && !!user.leader) {
-                    await trackEventLog(EventLogs.feedbackButtonClick, { userId: data.userId }, user.leader);
+                    await trackEventLog(EventLogs.feedbackButtonClick, { userId: data.userId }, user.leader, user);
                     ctx.status = 200;
                 } else {
                     ctx.status = 404;
@@ -92,7 +92,7 @@ export class EventController {
                 const user = await userRepository.findOne({where: { id: data.userId }, relations: ['leader']});
 
                 if (!!user && !!user.leader) {
-                    await trackEventLog(EventLogs.contactsSee, { userId: data.userId }, user.leader);
+                    await trackEventLog(EventLogs.contactsSee, { userId: data.userId }, user.leader, user);
                     ctx.status = 200;
                 } else {
                     ctx.status = 404;
