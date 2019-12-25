@@ -5,8 +5,8 @@
     <title>Be Happy 24</title>
 </head>
 <body>
-    <button onclick="telegramClick()">Telegram</button>
-    <button>Facebook</button>
+    <button onclick="telegramClick()" style="width: 160px; height: 100px">Telegram</button>
+    <!--<button>Facebook</button>-->
 </body>
 <script>
     (async () => {
@@ -26,7 +26,9 @@
     async function telegramClick() {
         const countryResult = await fetch('http://ip-api.com/json');
         const result = await countryResult.json();
-        location.replace(`https://t.me/behappy_test_bot?start=behappy24_AND_${result.countryCode.toLowerCase()}`);
+        const urlParams = new URLSearchParams(window.location.search);
+        const referId = urlParams.get('referId');
+        location.replace(`https://t.me/BeHappy24ClubBot?start=${referId}_AND_${result.countryCode.toLowerCase()}`);
     }
 </script>
 </html>
