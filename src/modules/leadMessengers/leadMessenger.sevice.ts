@@ -12,6 +12,7 @@ export async function createNewLeadMessengerItem(data, lead): Promise<any> {
         step: data.messengerInfo.step,
         lastSendTime: new Date().toISOString(),
         from: data.messengerInfo.messenger,
+        username: data.messengerInfo.username,
     });
 
     return leadMessengersRepository.save(newLeadMessengers);

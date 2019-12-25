@@ -22,6 +22,9 @@ export class LeadMessengersEntity {
     @Column({ name: 'from' })
     from: string;
 
+    @Column()
+    username: string;
+
     @ManyToOne(type => UserEntity, user => user.messengers)
     @JoinColumn({ name: 'user_id' })
     user: UserEntity;

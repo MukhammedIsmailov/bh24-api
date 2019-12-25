@@ -28,7 +28,7 @@
         const result = await countryResult.json();
         const urlParams = new URLSearchParams(window.location.search);
         const referId = urlParams.get('referId');
-        location.replace(`https://t.me/BeHappy24ClubBot?start=${referId}_AND_${result.countryCode.toLowerCase()}`);
+        location.replace(`https://t.me/behappy_test_bot?start=${referId}_AND_${result.countryCode.toLowerCase()}`);
     }
 </script>
 </html>

@@ -301,7 +301,7 @@ export class UserController {
                                                            OR  (position(LOWER(login) in '${data.searchFilter.toLocaleLowerCase()}') > 0)))` : '';
 
             const query = `SELECT "user".id, first_name, second_name, icon_url, country, note, status, "from", step, 
-                           "user".created_date, phone_number, last_send_time FROM "user" LEFT JOIN lead_messengers ON 
+                           "user".created_date, phone_number, last_send_time, username FROM "user" LEFT JOIN lead_messengers ON 
                            "user".id = lead_messengers.user_id WHERE leader_id = ${leaderId + messengerSubquery + lessonSubquery
                            + statusSubquery + dateSubquery + leadSubquery + partnerSubquery + searchSubquery};`;
 
