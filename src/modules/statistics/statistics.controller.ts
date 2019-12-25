@@ -34,7 +34,7 @@ export class StatisticsController {
                 GROUP BY event_log;`);
 
             const countsForCourseEfficiency = await eventRepository.query(`SELECT count(id), event_log FROM event 
-                WHERE event_log = '${EventLogs.courseSubscription}' OR event_log = '${EventLogs.courseFinished}' AND leader_id = ${ctx.currentParnter.id}
+                WHERE (event_log = '${EventLogs.courseSubscription}' OR event_log = '${EventLogs.courseFinished}') AND leader_id = ${ctx.currentParnter.id}
                 GROUP BY event_log;`);
 
             const countOfCourseFinishedRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseFinished });

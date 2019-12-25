@@ -7,4 +7,5 @@ export interface IReadWard {
     leadFilter: boolean;
     partnerFilter: boolean;
     searchFilter?: string;
+    feedbackFilter: boolean;
 }

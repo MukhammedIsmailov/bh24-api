@@ -85,6 +85,9 @@ export class UserEntity {
     @OneToMany(type => EventEntity, event => event.leader)
     events: EventEntity[];
 
+    @OneToMany(type => EventEntity, event => event.lead)
+    leadEvents: EventEntity[];
+
     @OneToMany(type => LeadMessengersEntity, leadMessengers => leadMessengers.user)
     messengers: LeadMessengersEntity[];
 
