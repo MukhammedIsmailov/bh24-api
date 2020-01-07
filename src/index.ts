@@ -4,6 +4,7 @@ import * as json from 'koa-json';
 import * as bodyParser from 'koa-bodyparser';
 import * as cors from '@koa/cors';
 import * as serve from 'koa-static';
+import * as mount from 'koa-mount';
 
 import { createConnection } from 'typeorm';
 
@@ -22,7 +23,7 @@ createConnection().then(async connection => {
     app.use(logger());
     app.use(bodyParser());
     app.use(cors());
-    app.use(serve('./data'));
+    app.use(mount('/data', serve('./data')));
 
     app.use( async(ctx, next) => {
         try {
