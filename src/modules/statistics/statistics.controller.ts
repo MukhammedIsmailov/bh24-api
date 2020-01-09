@@ -119,4 +119,29 @@ export class StatisticsController {
 
         next();
     }
+
+    static async latestRegistrationsByLeaders (ctx, next) {
+        try {
+            const leaderId = ctx.currentParnter.id;
+            const query = `SELECT id, first_name AS "firstName", 
+                              second_name AS "secondName", 
+                              icon_url AS "iconUrl", 
+                              leaders.count
+                              FROM "user"
+                              INNER JOIN (SELECT leader_id, count(id) AS count
+                                FROM "user"
+                                WHERE role = 'partner'
+                                  AND created_date > now() - INTERVAL '30 day'
+                                GROUP BY leader_id) AS leaders ON "user".id = leaders.leader_id
+                              WHERE role = 'partner' AND "user".leader_id = ${leaderId};`;
+
+            ctx.response.body = await getManager().query(query);
+            ctx.status = 200;
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+
+        next();
+    }
 }
