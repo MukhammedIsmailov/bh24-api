@@ -123,6 +123,7 @@ export class StatisticsController {
     static async latestRegistrationsByLeaders (ctx, next) {
         try {
             const leaderId = ctx.currentParnter.id;
+            const { interval } = ctx.request.query;
             const query = `SELECT id, first_name AS "firstName", 
                               second_name AS "secondName", 
                               icon_url AS "iconUrl", 
@@ -131,7 +132,7 @@ export class StatisticsController {
                               INNER JOIN (SELECT leader_id, count(id) AS count
                                 FROM "user"
                                 WHERE role = 'partner'
-                                  AND created_date > now() - INTERVAL '30 day'
+                                  AND created_date > now() - INTERVAL '${interval}'
                                 GROUP BY leader_id) AS leaders ON "user".id = leaders.leader_id
                               WHERE role = 'partner' AND "user".leader_id = ${leaderId};`;
 

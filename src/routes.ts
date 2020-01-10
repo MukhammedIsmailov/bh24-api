@@ -26,6 +26,7 @@ routes.get('/statistics', verifyToken, StatisticsController.statisticsRead);
 routes.get('/lesson-events', verifyToken, LessonEventController.lessonEventsRead);
 routes.get('/leads', verifyToken, UserController.leadsRead);
 routes.get('/latest-registrations', verifyToken, StatisticsController.latestRegistrationsRead);
+routes.get('/latest-registrations-by-leaders', verifyToken, StatisticsController.latestRegistrationsByLeaders);
 routes.get('/lesson', LessonController.lessonRead);
 routes.get('/partner/byUserId', UserController.leaderReadByUserId);
 routes.put('/event/feedback-button-click', EventController.feedbackButtonClickLogCreate);
