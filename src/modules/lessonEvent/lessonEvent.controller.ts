@@ -27,7 +27,8 @@ export class LessonEventController {
                         const newLog = await lessonEventRepository.create({
                             lessonNumber: data.step,
                             createdDate: new Date().toISOString(),
-                            lead: lead
+                            lead: lead,
+                            readingDate: !!data.extern ? new Date().toISOString() : null,
                         });
 
                         await lessonEventRepository.save(newLog);
