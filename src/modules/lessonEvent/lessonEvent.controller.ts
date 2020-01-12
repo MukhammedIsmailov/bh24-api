@@ -64,10 +64,18 @@ export class LessonEventController {
 
                 const user = await userRepository.findOne({ where: { id: id } });
                 if (!!user) {
-                    ctx.response.body = await lessonEventRepository.find({
+                    const lessons = await lessonEventRepository.find({
                         where: { lead: user },
                         select: ['lessonNumber', 'readingDate']
                     });
+
+                    ctx.response.body = {
+                        firstName: user.firstName,
+                        secondName: user.secondName,
+                        iconUrl: user.iconUrl,
+                        lessons,
+                    };
+
                     ctx.status = 200;
                 } else {
                     ctx.status = 404;

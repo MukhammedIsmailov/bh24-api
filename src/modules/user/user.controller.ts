@@ -258,6 +258,7 @@ export class UserController {
 
                 const partner = await userRepository.findOne({ id: id });
                 if (!!partner) {
+                    data.role = data.status === 'partner' ? 'partner' : partner.role;
                     await userRepository.update(id, data);
                     const updatedWard = await userRepository.findOne({ id: id },
                         { select: ['id', 'status', 'note'] });
