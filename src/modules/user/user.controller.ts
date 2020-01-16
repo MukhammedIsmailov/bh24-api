@@ -86,7 +86,9 @@ export class UserController {
             if (!!referId) {
                 const userRepository = getManager().getRepository(UserEntity);
 
-                const partner = await userRepository.findOne({ where: { referId: referId }, select: ['iconUrl', 'firstName', 'secondName', 'id'] });
+                const partner = await userRepository.findOne({ where: { referId: referId },
+                    select: ['iconUrl', 'firstName', 'secondName', 'id', 'questionWhoAreYou', 'questionWhy',
+                    'questionValue', 'questionStaff', 'questionResults'] });
                 if (!!partner) {
                     ctx.response.body = partner;
                     ctx.status = 200;
