@@ -15,35 +15,42 @@ export class LessonEventController {
                 const userRepository = getManager().getRepository(UserEntity);
                 const lessonEventRepository = getManager().getRepository(LessonEventEntity);
 
+                const lead = await userRepository.findOne( { where: { id: data.id }});
+
                 if (!!data.extern) {
                     lastStep = await getManager()
                         .query(`SELECT max(lesson_number) from lesson_event WHERE lead_id = ${data.id};`);
                     lastStep = lastStep[0].max;
-                }
-                if (!data.extern || (!!data.extern && lastStep < data.step)) {
-                    const lead = await userRepository.findOne( { where: { id: data.id }});
 
-                    if (!!lead) {
+                    if(lastStep < data.step) {
                         const newLog = await lessonEventRepository.create({
                             lessonNumber: data.step,
                             createdDate: new Date().toISOString(),
                             lead: lead,
-                            readingDate: !!data.extern ? new Date().toISOString() : null,
+                            readingDate: new Date().toISOString(),
                         });
 
                         await lessonEventRepository.save(newLog);
 
-                        if (!!data.extern) {
-                            await updateLeadMessengerItem(data);
-                        }
-                        ctx.status = 200;
+                        await updateLeadMessengerItem(data);
                     } else {
-                        ctx.status = 404;
+                        const log = await lessonEventRepository
+                            .query(`SELECT id FROM lesson_event WHERE lesson_number = ${data.step} AND lead_id = ${data.id};`);
+
+                        await lessonEventRepository.query(`UPDATE lesson_event SET reading_date = '${new Date().toISOString()}' WHERE id = ${log[0].id};`);
                     }
                 } else {
-                    ctx.status = 200;
+                    const newLog = await lessonEventRepository.create({
+                        lessonNumber: data.step,
+                        createdDate: new Date().toISOString(),
+                        lead: lead,
+                        readingDate: null,
+                    });
+
+                    await lessonEventRepository.save(newLog);
                 }
-            } else {
+            }
+            else {
                 ctx.status = 400;
             }
         } catch (e) {
