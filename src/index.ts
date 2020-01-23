@@ -5,6 +5,8 @@ import * as bodyParser from 'koa-bodyparser';
 import * as cors from '@koa/cors';
 import * as serve from 'koa-static';
 import * as mount from 'koa-mount';
+import * as websockify from 'koa-websocket';
+
 
 import { createConnection } from 'typeorm';
 
@@ -16,7 +18,7 @@ import { getConfig } from './config';
 
 createConnection().then(async connection => {
 
-    const app = new Koa();
+    const app = websockify(new Koa());
     const port = getConfig().appPort;
 
     app.use(json());
@@ -33,6 +35,13 @@ createConnection().then(async connection => {
             ctx.body = e.message;
             ctx.app.emit('error', e, ctx);
         }
+    });
+
+    app.ws.use((ctx) => {
+        // the websocket is added to the context as `ctx.websocket`.
+        ctx.websocket.on('message', function(message) {
+            console.log('message');
+        });
     });
 
     app.use(routes.routes()).use(routes.allowedMethods());

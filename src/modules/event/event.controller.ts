@@ -106,4 +106,7 @@ export class EventController {
         }
         next();
     }
+
+    static async freeConsultationEventlog (ctx, next) {
+    }
 }
