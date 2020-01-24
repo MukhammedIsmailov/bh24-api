@@ -68,6 +68,12 @@ export class EventController {
 
                 if (!!user && !!user.leader) {
                     await trackEventLog(EventLogs.feedbackButtonClick, { userId: data.userId }, user.leader, user);
+                        ctx.io.emit('feedbackClick', {
+                            partnerId: user.leader.id,
+                            firstName: user.firstName,
+                            secondName: user.secondName,
+                            date: new Date().toISOString(),
+                        });
                     ctx.status = 200;
                 } else {
                     ctx.status = 404;
@@ -105,8 +111,5 @@ export class EventController {
             ctx.status = 400;
         }
         next();
-    }
-
-    static async freeConsultationEventlog (ctx, next) {
     }
 }
