@@ -64,7 +64,7 @@ export class EventController {
             try {
                 const userRepository = getManager().getRepository(UserEntity);
 
-                const user = await userRepository.findOne({where: { id: data.userId }, relations: ['leader']});
+                const user = await userRepository.findOne({where: { id: data.userId }, relations: ['leader', 'messengers']});
 
                 if (!!user && !!user.leader) {
                     await trackEventLog(EventLogs.feedbackButtonClick, { userId: data.userId }, user.leader, user);
@@ -73,6 +73,8 @@ export class EventController {
                             firstName: user.firstName,
                             secondName: user.secondName,
                             date: new Date().toISOString(),
+                            username: user.messengers[0].username,
+                            from: user.messengers[0].from,
                         });
                     ctx.status = 200;
                 } else {
