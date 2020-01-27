@@ -40,7 +40,7 @@ createConnection().then(async connection => {
 
     app.use(routes.routes()).use(routes.allowedMethods());
 
-    const server = https.createServer(app.callback());
+    const server = http.createServer(app.callback());
 
     app.context.io = socket(server);
 
