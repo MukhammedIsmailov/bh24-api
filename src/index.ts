@@ -7,6 +7,7 @@ import * as serve from 'koa-static';
 import * as mount from 'koa-mount';
 import * as socket from 'socket.io';
 import * as http from 'http';
+import * as https from 'https';
 
 import { createConnection } from 'typeorm';
 
@@ -39,7 +40,7 @@ createConnection().then(async connection => {
 
     app.use(routes.routes()).use(routes.allowedMethods());
 
-    const server = http.createServer(app.callback());
+    const server = https.createServer(app.callback());
 
     app.context.io = socket(server);
 
