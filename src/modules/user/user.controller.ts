@@ -16,6 +16,7 @@ import { IReadWard  } from './DTO/IReadWard';
 import { IReadLeads  } from './DTO/IReadLeads';
 import { getConfig } from '../../config';
 import { createNewLeadMessengerItem } from '../leadMessengers/leadMessenger.sevice';
+import { updateNotification } from '../notification/notification.service';
 
 export class UserController {
     static async me (ctx, next) {
@@ -264,6 +265,7 @@ export class UserController {
                     await userRepository.update(id, data);
                     const updatedWard = await userRepository.findOne({ id: id },
                         { select: ['id', 'status', 'note'] });
+                    await updateNotification(id);
                     ctx.response.body =  updatedWard;
                     ctx.status = 200;
                 } else {
@@ -307,7 +309,7 @@ export class UserController {
                                                            OR  (position(LOWER(login) in '${data.searchFilter.toLocaleLowerCase()}') > 0)))` : '';
 
             const query = `SELECT DISTINCT "user".id, first_name, second_name, icon_url, country, note, status, "from", step,
-                                  "user".created_date, phone_number, last_send_time, username, feedback, contacts, max_lesson_number
+                                  "user".created_date, phone_number, last_send_time, username, feedback, contacts, max_lesson_number, active.active
                             FROM "user"
                                 LEFT JOIN lead_messengers ON "user".id = lead_messengers.user_id
                                 LEFT JOIN event ON "user".id = event.lead_id
@@ -315,9 +317,11 @@ export class UserController {
                                                   count(CASE WHEN event_log = '${EventLogs.contactsSee}' THEN 1 ELSE NULL END) AS contacts, event.lead_id
                                             FROM event WHERE event.leader_id = ${leaderId}
                                             GROUP BY event.lead_id) AS eventCount ON "user".id = eventCount.lead_id
-                                LEFT JOIN (SELECT max(lesson_number) AS max_lesson_number, lesson_event.lead_id 
+                                LEFT JOIN (SELECT max(lesson_number) AS max_lesson_number, lesson_event.lead_id
                                             FROM lesson_event 
-                                            GROUP BY lesson_event.lead_id) AS lessonEvent ON "user".id = lessonEvent.lead_id                                            
+                                            GROUP BY lesson_event.lead_id) AS lessonEvent ON "user".id = lessonEvent.lead_id
+                                LEFT JOIN (SELECT DISTINCT lead_id AS lead_id, CASE WHEN updated_date IS NULL AND deleted_date IS NULL THEN TRUE ELSE FALSE END 
+                                                  AS active FROM notification) AS active ON "user".id = active.lead_id                                             
                             WHERE "user".leader_id = ${leaderId + messengerSubquery + lessonSubquery
                                                 + statusSubquery + dateSubquery + leadSubquery + partnerSubquery + 
                                                   searchSubquery + feedbackSubquery + contactsSubquery + lessonFinishSubquery}`;

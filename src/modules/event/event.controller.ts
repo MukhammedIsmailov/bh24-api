@@ -5,6 +5,7 @@ import { ICourseFinishedLog } from './DTO/ICourseFinishedLog';
 import { UserEntity } from '../user/user.entity';
 import { EventLogs } from '../../lib/eventLogs';
 import { trackEventLog } from './event.service';
+import { createNotification } from '../notification/notification.service';
 
 export class EventController {
     static async landingVisitLogCreate (ctx, next) {
@@ -67,12 +68,16 @@ export class EventController {
                 const user = await userRepository.findOne({where: { id: data.userId }, relations: ['leader', 'messengers']});
 
                 if (!!user && !!user.leader) {
+                    const currentDate = new Date();
+
+                    await createNotification(currentDate, user.leader, user, user.messengers[0]);
+
                     await trackEventLog(EventLogs.feedbackButtonClick, { userId: data.userId }, user.leader, user);
                         ctx.io.emit('feedbackClick', {
                             partnerId: user.leader.id,
                             firstName: user.firstName,
                             secondName: user.secondName,
-                            date: new Date().toISOString(),
+                            date: currentDate.toISOString(),
                             username: user.messengers[0].username,
                             from: user.messengers[0].from,
                         });

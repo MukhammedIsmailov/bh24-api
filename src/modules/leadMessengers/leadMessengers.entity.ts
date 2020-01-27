@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { UserEntity } from '../user/user.entity';
+import { NotificationEntity } from '../notification/notification.entity';
 
 @Entity({ name: 'lead_messengers' })
 export class LeadMessengersEntity {
@@ -28,4 +29,7 @@ export class LeadMessengersEntity {
     @ManyToOne(type => UserEntity, user => user.messengers)
     @JoinColumn({ name: 'user_id' })
     user: UserEntity;
+
+    @OneToMany(type => NotificationEntity, notifications => notifications.messenger)
+    notifications: NotificationEntity[];
 }

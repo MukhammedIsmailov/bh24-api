@@ -2,7 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColum
 
 import { EventEntity } from '../event/event.entity';
 import { LeadMessengersEntity } from '../leadMessengers/leadMessengers.entity';
-import { LessonEventEntity } from '../lessonEvent/lessonEvent.entity'
+import { LessonEventEntity } from '../lessonEvent/lessonEvent.entity';
+import { NotificationEntity } from '../notification/notification.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity {
@@ -99,4 +100,10 @@ export class UserEntity {
 
     @Column()
     status: string;
+
+    @OneToMany(type => NotificationEntity, notifications => notifications.lead)
+    leadNotifications: NotificationEntity[];
+
+    @OneToMany(type => NotificationEntity, notifications => notifications.leader)
+    leaderNotifications: NotificationEntity[];
 }
