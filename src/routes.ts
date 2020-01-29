@@ -28,6 +28,7 @@ routes.get('/leads', verifyToken, UserController.leadsRead);
 routes.get('/latest-registrations', verifyToken, StatisticsController.latestRegistrationsRead);
 routes.get('/latest-registrations-by-leaders', verifyToken, StatisticsController.latestRegistrationsByLeaders);
 routes.get('/lesson', LessonController.lessonRead);
+routes.get('/lesson/is-done', LessonController.lessonIsDone);
 routes.get('/partner/byUserId', UserController.leaderReadByUserId);
 routes.put('/event/feedback-button-click', EventController.feedbackButtonClickLogCreate);
 routes.put('/event/contacts-see', EventController.contactsSeeEventLog);
@@ -41,5 +42,6 @@ routes.get('/lead/messenger/all', LeadMessengersController.readAll);
 routes.post('/lead/messenger', LeadMessengersController.update);
 routes.put('/event/course-finished', EventController.courseFinishedLogCreate);
 routes.put('/lesson-event', LessonEventController.lessonEventLogCreate);
+
 
 export default routes;
