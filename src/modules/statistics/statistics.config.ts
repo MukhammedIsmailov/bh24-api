@@ -39,7 +39,7 @@ const statisticsConfig = {
         pointHoverBorderColor: 'transparent',
         showLine: true,
     },
-    NL: {
+    NC: {
         fill: false,
         borderColor: '#f1c40f',
         pointBackgroundColor: 'transparent',

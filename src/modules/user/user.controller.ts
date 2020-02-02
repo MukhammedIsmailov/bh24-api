@@ -1,22 +1,22 @@
-import { getManager } from 'typeorm';
-import { sign } from 'jsonwebtoken';
+import {getManager} from 'typeorm';
+import {sign} from 'jsonwebtoken';
 import * as moment from 'moment';
 
-import { UserEntity } from './user.entity';
-import { createValidator, loginValidator, updateValidator } from './user.validator';
-import { comparePasswords, getEncryptedPassword, getCountryCode } from './user.service';
-import { trackEventLog } from '../event/event.service';
-import { EventLogs } from '../../lib/eventLogs';
-import { ICreatePartner } from './DTO/ICreatePartner';
-import { IUpdatePartner } from './DTO/IUpdatePartner';
-import { IAuthorizePartner } from './DTO/IAuthorizePartner';
-import { ICreateLead } from './DTO/ICreateLead';
-import { IUpdateWard  } from './DTO/IUpdateWard';
-import { IReadWard  } from './DTO/IReadWard';
-import { IReadLeads  } from './DTO/IReadLeads';
-import { getConfig } from '../../config';
-import { createNewLeadMessengerItem } from '../leadMessengers/leadMessenger.sevice';
-import { updateNotification } from '../notification/notification.service';
+import {UserEntity} from './user.entity';
+import {createValidator, loginValidator, updateValidator} from './user.validator';
+import {comparePasswords, getCountryCode, getEncryptedPassword} from './user.service';
+import {trackEventLog} from '../event/event.service';
+import {EventLogs} from '../../lib/eventLogs';
+import {ICreatePartner} from './DTO/ICreatePartner';
+import {IUpdatePartner} from './DTO/IUpdatePartner';
+import {IAuthorizePartner} from './DTO/IAuthorizePartner';
+import {ICreateLead} from './DTO/ICreateLead';
+import {IUpdateWard} from './DTO/IUpdateWard';
+import {IReadWard} from './DTO/IReadWard';
+import {IReadLeads} from './DTO/IReadLeads';
+import {getConfig} from '../../config';
+import {createNewLeadMessengerItem} from '../leadMessengers/leadMessenger.sevice';
+import {updateNotification} from '../notification/notification.service';
 
 export class UserController {
     static async me (ctx, next) {
@@ -110,7 +110,6 @@ export class UserController {
     static async partnerCreate (ctx, next) {
         try {
             const data: ICreatePartner = ctx.request.body;
-            console.log(data)
             const userRepository = getManager().getRepository(UserEntity);
             const wrongFields = await createValidator(data, userRepository);
             if (wrongFields.length === 0) {
@@ -120,7 +119,6 @@ export class UserController {
                     ...data, createdDate: new Date().toISOString(), role: 'partner', leader: leader, country: getCountryCode(data.ip),
                 });
                 const createdPartner = await userRepository.save(newPartner);
-                await trackEventLog(EventLogs.newPartner, null, leader);
 
                 const { note, status, country, role,   ...responseData } = createdPartner;
 
@@ -234,7 +232,6 @@ export class UserController {
                     const savedLead = await userRepository.save(newLead);
                     await createNewLeadMessengerItem(data, savedLead);
                     await trackEventLog(EventLogs.courseSubscription, null, leader);
-                    await trackEventLog(EventLogs.newLead, null, leader);
                         ctx.response.body = {
                             id: savedLead.id,
                         };
@@ -256,12 +253,25 @@ export class UserController {
         try {
             const data: IUpdateWard = ctx.request.body;
             const id = Number.parseInt(ctx.request.query.id);
+            const leaderId = ctx.currentParnter.id;
             if (!!data.note || !!data.status) {
                 const userRepository = getManager().getRepository(UserEntity);
 
                 const partner = await userRepository.findOne({ id: id });
+                const leader = await userRepository.findOne({ id: leaderId });
                 if (!!partner) {
-                    data.role = data.status === 'partner' ? 'partner' : partner.role;
+                    if(data.status === 'partner') {
+                        data.role = 'partner';
+                        if(partner.role !== data.role) {
+                            await trackEventLog(EventLogs.newPartner, null, leader);
+                        }
+                    }
+                    if(data.status === 'client') {
+                        data.role = 'client';
+                        if(partner.role !== data.role) {
+                            await trackEventLog(EventLogs.newClient, null, leader);
+                        }
+                    }
                     await userRepository.update(id, data);
                     const updatedWard = await userRepository.findOne({ id: id },
                         { select: ['id', 'status', 'note'] });

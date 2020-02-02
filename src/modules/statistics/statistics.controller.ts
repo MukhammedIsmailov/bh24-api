@@ -29,9 +29,13 @@ export class StatisticsController {
 
             const totalCount = await eventRepository.query(`SELECT count(id) FROM event WHERE leader_id = ${ctx.currentParnter.id};`);
 
-            const countsForPaymentEfficiency = await eventRepository.query(`SELECT count(id), event_log FROM event 
-                WHERE event_log = '${EventLogs.landingVisit}' OR event_log = '${EventLogs.paidAffiliate}' AND leader_id = ${ctx.currentParnter.id}
-                GROUP BY event_log;`);
+            const countsForPaymentEfficiencyRAW = await eventRepository.query(`SELECT count(DISTINCT "user".id) AS paid,
+                                                                                            count(event_log) AS visit
+                                                                                      FROM "user"
+                                                                                      LEFT JOIN event ON "user".leader_id = event.leader_id
+                                                                                      WHERE "user".leader_id = ${ctx.currentParnter.id}
+                                                                                          AND ("user".role = 'partner' OR "user".role = 'client')
+                                                                                          AND event.event_log = 'VL';`);
 
             const countsForCourseEfficiency = await eventRepository.query(`SELECT count(id), event_log FROM event 
                 WHERE (event_log = '${EventLogs.courseSubscription}' OR event_log = '${EventLogs.courseFinished}') AND leader_id = ${ctx.currentParnter.id}
@@ -40,17 +44,15 @@ export class StatisticsController {
             const countOfCourseFinishedRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseFinished });
             const countOfCourseSubscriptionRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseSubscription });
 
-            const countOfTransitionsRAW = countsForPaymentEfficiency.find(item => { return item['event_log'] === EventLogs.landingVisit });
-            const countOfPaymentsRAW = countsForPaymentEfficiency.find(item => { return item['event_log'] === EventLogs.paidAffiliate });
-
-            const countOfTransitions = !!countOfTransitionsRAW ? parseInt(countOfTransitionsRAW['count']) : 0;
-            const countOfPayments = !!countOfPaymentsRAW ? parseInt(countOfPaymentsRAW['count']) : 0;
-
             const countOfCourseFinished = !!countOfCourseFinishedRAW ? parseInt(countOfCourseFinishedRAW['count']) : 0;
             const countOfCourseSubscription = !!countOfCourseSubscriptionRAW ? parseInt(countOfCourseSubscriptionRAW['count']) : 0;
 
-            const paymentEfficiency = !!countOfTransitions && !!countOfPayments ? Math.round(countOfPayments / countOfTransitions * 100): 0;
+            const paidCountForPaymentEfficiency = !!countsForPaymentEfficiencyRAW[0]['paid'] ? parseInt(countsForPaymentEfficiencyRAW[0]['paid']) : 0;
+            const visitCountForPaymentEfficiency = !!countsForPaymentEfficiencyRAW[0]['visit'] ? parseInt(countsForPaymentEfficiencyRAW[0]['visit']) : 0;
+
+            const paymentEfficiency = !!paidCountForPaymentEfficiency ? Math.round(paidCountForPaymentEfficiency / visitCountForPaymentEfficiency * 100) : 0;
             const courseEfficiency = !!countOfCourseFinished && !!countOfCourseSubscription ? Math.round(countOfCourseFinished / countOfCourseSubscription * 100) : 0;
+
 
             const counts = [];
             const total = parseInt(totalCount[0]['count']);
@@ -97,20 +99,23 @@ export class StatisticsController {
     }
 
     static async latestRegistrationsRead (ctx, next) {
+        const limit = ctx.request.query.limit;
         try {
-            const leaderId = ctx.currentParnter.id;
-            const startDate = moment().subtract(1, 'months').toISOString();
-            const query = `SELECT first_name   AS "firstName",
-                              second_name  AS "secondName",
-                              icon_url     AS "iconUrl",
-                              country,
-                              created_date AS "createdDate"
-                              FROM "user"
-                              WHERE leader_id = ${leaderId}
-                                AND created_date BETWEEN '${startDate}' AND now()
-                                AND role = 'partner';`;
+            const query = `SELECT 
+                                first_name AS "firstName",
+                                second_name AS "secondName", 
+                                country,
+                                u.created_date AS "createdDate"
+                            FROM lead_messengers
+                              INNER JOIN "user" u on lead_messengers.user_id = u.id
+                              WHERE created_date BETWEEN now() - INTERVAL '1 month' AND now()
+                              ORDER BY "createdDate" DESC LIMIT ${limit};`;
+            const countQuery = 'SELECT count(id) FROM lead_messengers';
 
-            ctx.response.body = await getManager().query(query);
+            const registrations = await getManager().query(query);
+            const count = await getManager().query(countQuery);
+
+            ctx.response.body = { registrations, count: count[0].count };
             ctx.status = 200;
         } catch (e) {
             console.log(e);
@@ -122,20 +127,18 @@ export class StatisticsController {
 
     static async latestRegistrationsByLeaders (ctx, next) {
         try {
-            const leaderId = ctx.currentParnter.id;
             const { interval } = ctx.request.query;
             const query = `SELECT id, first_name AS "firstName", 
                               second_name AS "secondName", 
                               icon_url AS "iconUrl", 
-                              leaders.count
+                              events.count
                               FROM "user"
-                              INNER JOIN (SELECT leader_id, count(id) AS count
-                                FROM "user"
-                                WHERE role = 'partner'
+                              INNER JOIN (SELECT leader_id, count(event.id) AS count
+                                FROM event
+                                WHERE event_log = 'SC'
                                   AND created_date > now() - INTERVAL '${interval}'
-                                GROUP BY leader_id) AS leaders ON "user".id = leaders.leader_id
-                              WHERE role = 'partner' AND "user".leader_id = ${leaderId};`;
-
+                                GROUP BY leader_id) AS events ON "user".id = events.leader_id
+                            ORDER BY events.count DESC LIMIT 5;`;
             ctx.response.body = await getManager().query(query);
             ctx.status = 200;
         } catch (e) {
