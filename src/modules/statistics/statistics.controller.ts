@@ -108,7 +108,6 @@ export class StatisticsController {
                                 u.created_date AS "createdDate"
                             FROM lead_messengers
                               INNER JOIN "user" u on lead_messengers.user_id = u.id
-                              WHERE created_date BETWEEN now() - INTERVAL '1 month' AND now()
                               ORDER BY "createdDate" DESC LIMIT ${limit};`;
             const countQuery = 'SELECT count(id) FROM lead_messengers';
 

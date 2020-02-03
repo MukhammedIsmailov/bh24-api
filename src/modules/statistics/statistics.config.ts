@@ -47,9 +47,6 @@ const statisticsConfig = {
         pointHoverBorderColor: 'transparent',
         showLine: true,
     },
-    PA: {
-        showLine: false,
-    },
     CS: {
         showLine: false,
     }

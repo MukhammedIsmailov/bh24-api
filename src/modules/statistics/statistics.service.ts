@@ -24,5 +24,7 @@ export function plotDataGenerate(dataFromDB: IDataFromDB[][], eventTypes) {
         };
     });
 
+    plotData.dataset.splice(6, 1);
+
     return plotData;
 }

@@ -5,6 +5,5 @@ export enum EventLogs {
     feedbackButtonClick = 'FB',
     newPartner = 'NP',
     newClient = 'NC',
-    paidAffiliate = 'PA',
     contactsSee = 'CS',
 }
