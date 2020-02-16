@@ -4,7 +4,7 @@ import * as moment from 'moment';
 
 import {UserEntity} from './user.entity';
 import {createValidator, loginValidator, updateValidator} from './user.validator';
-import {comparePasswords, getCountryCode, getEncryptedPassword} from './user.service';
+import {comparePasswords, getCountryCode, getEncryptedPassword, getSubquery} from './user.service';
 import {trackEventLog} from '../event/event.service';
 import {EventLogs} from '../../lib/eventLogs';
 import {ICreatePartner} from './DTO/ICreatePartner';
@@ -17,6 +17,7 @@ import {IReadLeads} from './DTO/IReadLeads';
 import {getConfig} from '../../config';
 import {createNewLeadMessengerItem} from '../leadMessengers/leadMessenger.sevice';
 import {updateNotification} from '../notification/notification.service';
+import { Messenger } from '../leadMessengers/DTO/IMessengerInfo';
 
 export class UserController {
     static async me (ctx, next) {
@@ -305,18 +306,25 @@ export class UserController {
             const startDate = startDateTime.format(psqlDateFormat);
             const endDate = endDateTime.format(psqlDateFormat);
 
-            const messengerSubquery = !!data.messengerFilter && data.messengerFilter !== "null" ? ` AND "from" = '${data.messengerFilter}'` : '';
-            const lessonSubquery = !!data.lessonFilter && data.lessonFilter !== "null" ? ` AND step = ${data.lessonFilter}` : '';
-            const statusSubquery = !!data.statusFilter  && data.statusFilter !== "null" ? ` AND status = '${data.statusFilter}'`: '';
-            const dateSubquery = ` AND "user".created_date > '${startDate}' AND "user".created_date < '${endDate}'`;
-            const leadSubquery = data.leadFilter === false ? ` AND role != 'lead'` : '';
-            const partnerSubquery = data.partnerFilter === false ? ` AND role != 'partner'` : '';
-            const feedbackSubquery = data.feedbackFilter === false ? ` AND feedback > 0` : '';
-            const contactsSubquery = data.contactsFilter === false ? ` AND contacts > 0` : '';
-            const lessonFinishSubquery = data.lessonFinishFilter === false ? ` AND max_lesson_number != 4` : '';
+            const subqueriesFilters = new Array(9);
+
+            subqueriesFilters[0] = !!data.facebookFilter ? `lead_messengers."from" = '${Messenger.Facebook}'` : null;
+            subqueriesFilters[1] = !!data.telegramFilter ? `lead_messengers."from" = '${Messenger.Telegram}'` : null;
+            subqueriesFilters[2] = !!data.contactsSeeFilter ? 'contacts > 0' : null;
+            subqueriesFilters[3] = !!data.feedbackFilter ? 'feedback > 0' : null;
+            subqueriesFilters[4] = !!data.contactFilter ? `"user".status = 'contact'` : null;
+            subqueriesFilters[5] = !!data.renouncementFilter ? `"user".status = 'renouncement'` : null;
+            subqueriesFilters[6] = !!data.clientFilter ? `"user".status = 'client'` : null;
+            subqueriesFilters[7] = !!data.partnerFilter ? `"user".status = 'partner'` : null;
+            subqueriesFilters[8] = `step = ${data.lessonFilter}`;
+
+            const subquery = getSubquery(subqueriesFilters);
+
             const searchSubquery = !!data.searchFilter ? ` AND (position(LOWER(first_name) in '${data.searchFilter.toLocaleLowerCase()}') > 0
                                                            OR  (position(LOWER(second_name) in '${data.searchFilter.toLocaleLowerCase()}') > 0
                                                            OR  (position(LOWER(login) in '${data.searchFilter.toLocaleLowerCase()}') > 0)))` : '';
+
+            const dateSubquery = ` AND "user".created_date > '${startDate}' AND "user".created_date < '${endDate}'`;
 
             const query = `SELECT DISTINCT "user".id, first_name, second_name, icon_url, country, note, status, "from", step,
                                   "user".created_date, phone_number, last_send_time, username, feedback, contacts, max_lesson_number, active.active
@@ -332,9 +340,7 @@ export class UserController {
                                             GROUP BY lesson_event.lead_id) AS lessonEvent ON "user".id = lessonEvent.lead_id
                                 LEFT JOIN (SELECT DISTINCT lead_id AS lead_id, CASE WHEN updated_date IS NULL AND deleted_date IS NULL THEN TRUE ELSE FALSE END 
                                                   AS active FROM notification) AS active ON "user".id = active.lead_id                                             
-                            WHERE "user".leader_id = ${leaderId + messengerSubquery + lessonSubquery
-                                                + statusSubquery + dateSubquery + leadSubquery + partnerSubquery + 
-                                                  searchSubquery + feedbackSubquery + contactsSubquery + lessonFinishSubquery}`;
+                            WHERE "user".refer_id IS NULL AND "user".leader_id = ${leaderId + dateSubquery + subquery + searchSubquery};`;
 
             const result = await getManager().query(query);
             ctx.response.body = result;

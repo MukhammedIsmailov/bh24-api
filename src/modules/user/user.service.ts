@@ -14,3 +14,20 @@ export function comparePasswords(encryptedPassword, inputPassword): boolean {
 export function getCountryCode(ip: string) : string {
     return lookup(ip).country.toLowerCase();
 }
+
+export function getSubquery(subqueriesFilters) {
+    let index = 0;
+    let subquery = ' AND (';
+    subqueriesFilters.forEach((subqueryFilter) => {
+        if(!!subqueryFilter) {
+            if(index !== 0) {
+                subquery += ' OR ';
+            }
+            subquery += subqueryFilter;
+            index ++;
+        }
+    });
+    subquery += ')';
+
+    return subquery;
+}

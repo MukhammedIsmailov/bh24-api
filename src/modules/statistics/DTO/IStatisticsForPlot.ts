@@ -3,6 +3,7 @@ import {Interface} from "readline";
 export interface IStatisticsForPlotRequest {
     startDate: string;
     endDate: string;
+    interval?: 'month' | 'week' | 'year' | 'null';
 }
 
 export interface IStatisticsForPlotResponse {

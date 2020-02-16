@@ -12,8 +12,13 @@ export class StatisticsController {
 
         const psqlDateFormat = 'YYYY-MM-DD HH:mm:ss';
 
-        const endDateTime = !!data.endDate ? moment.unix(parseInt(data.endDate, 10)).utc() : moment().utc();
-        const startDateTime = !!data.startDate ? moment.unix(parseInt(data.startDate, 10)).utc() : endDateTime.clone().subtract(1, 'months').utc();
+        let endDateTime = !!data.endDate ? moment.unix(parseInt(data.endDate, 10)).utc() : moment().utc();
+        let startDateTime = !!data.startDate ? moment.unix(parseInt(data.startDate, 10)).utc() : endDateTime.clone().subtract(1, 'months').utc();
+
+        if(data.interval !== 'null') {
+            endDateTime = moment().utc();
+            startDateTime = endDateTime.clone().subtract(1, data.interval).utc();
+        }
 
         const startDate = startDateTime.format(psqlDateFormat);
         const endDate = endDateTime.format(psqlDateFormat);
