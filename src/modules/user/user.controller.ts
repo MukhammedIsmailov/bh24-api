@@ -4,7 +4,7 @@ import * as moment from 'moment';
 
 import {UserEntity} from './user.entity';
 import {createValidator, loginValidator, updateValidator} from './user.validator';
-import {comparePasswords, getCountryCode, getEncryptedPassword, getSubquery} from './user.service';
+import {comparePasswords, getEncryptedPassword, getSubquery} from './user.service';
 import {trackEventLog} from '../event/event.service';
 import {EventLogs} from '../../lib/eventLogs';
 import {ICreatePartner} from './DTO/ICreatePartner';
@@ -117,7 +117,7 @@ export class UserController {
                 const leader = await userRepository.findOne({ id: data.leaderId });
 
                 const newPartner = await userRepository.create({
-                    ...data, createdDate: new Date().toISOString(), role: 'partner', leader: leader, country: getCountryCode(data.ip),
+                    ...data, createdDate: new Date().toISOString(), role: 'partner', leader: leader, country: data.country,
                 });
                 const createdPartner = await userRepository.save(newPartner);
 
