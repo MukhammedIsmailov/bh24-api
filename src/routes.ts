@@ -29,6 +29,7 @@ routes.get('/latest-registrations', StatisticsController.latestRegistrationsRead
 routes.get('/latest-registrations-by-leaders', StatisticsController.latestRegistrationsByLeaders);
 routes.get('/lesson', LessonController.lessonRead);
 routes.get('/lesson/is-done', LessonController.lessonIsDone);
+routes.get('/lesson/get-count-road-lesson', LessonController.getCountRoadLesson)
 routes.get('/partner/byUserId', UserController.leaderReadByUserId);
 routes.put('/event/feedback-button-click', EventController.feedbackButtonClickLogCreate);
 routes.put('/event/contacts-see', EventController.contactsSeeEventLog);

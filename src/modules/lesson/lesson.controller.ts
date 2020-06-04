@@ -41,4 +41,23 @@ export class LessonController {
         }
         next();
     }
+
+    static async getCountRoadLesson(ctx, next) {
+        const userId = ctx.request.query.userId;
+
+        const queryForLessons = `SELECT count(id) FROM lesson;`;
+        const queryForEvents = `SELECT count(id) FROM lesson_event WHERE lead_id = ${userId} AND reading_date IS NOT NULL;`;
+        try {
+            const resultOfLessons = await getManager().query(queryForLessons);
+            const numberOfLessons = parseInt(resultOfLessons[0].count);
+            const resultOfEvents = await getManager().query(queryForEvents);
+            const numberOfEvents = parseInt(resultOfEvents[0].count);
+            ctx.response.body = { result: numberOfEvents === numberOfLessons - 1};
+            ctx.status = 200;
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+        next();
+    }
 }
