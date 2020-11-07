@@ -30,6 +30,8 @@ export class UserController {
                                "user".login,
                                "user".icon_url     AS "iconUrl",
                                "user".leader_id,
+                               "user".subscription_end,
+                               "user".subscription_name,
                                leader.first_name   AS "leaderFirstName",
                                leader.second_name  AS "leaderSecondName",
                                leader.icon_url     AS "leaderIconUrl",
