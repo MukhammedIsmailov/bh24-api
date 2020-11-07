@@ -22,18 +22,8 @@ export class createOrderTable1604691889835 implements MigrationInterface {
                     {
                         name: 'payed_at',
                         type: 'varchar',
-                        isNullable: false,
+                        isNullable: true,
                     },
-                    /*{
-                        name: 'user_id',
-                        type: 'int',
-                        isNullable: false
-                    },
-                    {
-                        name: 'product_id',
-                        type: 'int', 
-                        isNullable: false
-                    }*/
                 ],
             }), true);
 
