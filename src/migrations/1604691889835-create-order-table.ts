@@ -21,8 +21,7 @@ export class createOrderTable1604691889835 implements MigrationInterface {
                     },
                     {
                         name: 'payed_at',
-                        type: 'varchar',
-                        isNullable: true,
+                        type: 'varchar'
                     },
                 ],
             }), true);
@@ -53,7 +52,7 @@ export class createOrderTable1604691889835 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        
+
     }
 
 }
