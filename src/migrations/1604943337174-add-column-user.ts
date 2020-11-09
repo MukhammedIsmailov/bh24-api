@@ -6,12 +6,14 @@ export class addColumnUser1604943337174 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.addColumn('user', new TableColumn({
             name: 'subscription_end',
-            type: 'varchar'
+            type: 'varchar',
+            isNullable: true,
         }));
 
         await queryRunner.addColumn('user', new TableColumn({
             name: 'subscription_name',
-            type: 'varchar'
+            type: 'varchar',
+            isNullable: true,
         }));
     }
 
