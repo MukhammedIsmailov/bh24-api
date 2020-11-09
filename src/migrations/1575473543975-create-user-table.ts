@@ -124,16 +124,6 @@ export class createUserTable1575473543975 implements MigrationInterface {
                     name: 'created_date',
                     type: 'timestamp',
                     isNullable: true
-                },
-                {
-                    name: 'subscription_end',
-                    type: 'varchar',
-                    isNullable: true
-                },
-                {
-                    name: 'subscription_name',
-                    type: 'varchar',
-                    isNullable: true
                 }
             ]
         }),true);
