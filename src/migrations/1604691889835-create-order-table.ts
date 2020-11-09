@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner, Table, TableForeignKey} from "typeorm";
+import {MigrationInterface, QueryRunner, Table, TableForeignKey, TableColumn} from "typeorm";
 
 export class createOrderTable1604691889835 implements MigrationInterface {
     name = 'createOrderTable1604691889835'
@@ -22,10 +22,20 @@ export class createOrderTable1604691889835 implements MigrationInterface {
                     {
                         name: 'payed_at',
                         type: 'varchar',
-                        isNullable: false,
-                    }
+                        isNullable: true,
+                    },
                 ],
             }), true);
+
+            await queryRunner.addColumn('order', new TableColumn({
+                name: 'user_id',
+                type: 'int'
+            }));
+
+            await queryRunner.addColumn('order', new TableColumn({
+                name: 'product_id',
+                type: 'int'
+            }));
 
             await queryRunner.createForeignKey('order', new TableForeignKey({
                 columnNames: ['user_id'],
@@ -34,7 +44,7 @@ export class createOrderTable1604691889835 implements MigrationInterface {
                 onDelete: 'CASCADE'
             }));
 
-            await queryRunner.createForeignKey('product', new TableForeignKey({
+            await queryRunner.createForeignKey('order', new TableForeignKey({
                 columnNames: ['product_id'],
                 referencedColumnNames: ['id'],
                 referencedTableName: 'product',
