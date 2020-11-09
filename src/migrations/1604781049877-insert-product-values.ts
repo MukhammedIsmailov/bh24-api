@@ -27,6 +27,7 @@ export class insertProductValues1604781049877 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        const connection = getConnection();
         await connection.createQueryBuilder().delete().from(ProductEntity)
     }
 
