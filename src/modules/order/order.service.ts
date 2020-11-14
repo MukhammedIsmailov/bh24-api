@@ -23,7 +23,7 @@ export class OrderService{
     async getPaymentLink(price, productId, orderId ){
         let data = {
             request: {
-                amount: price.toString(),
+                amount: `${price.toString()}.00`,
                 currency: process.env.CURENCY,
                 merchant_id: process.env.MERCHANT_ID.toString(),
                 order_desc: `Оплата заказа № ${orderId}`,
