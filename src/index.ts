@@ -8,7 +8,6 @@ import * as mount from 'koa-mount';
 import * as socket from 'socket.io';
 import * as http from 'http';
 import * as https from 'https';
-import * as Queue from 'bull';
 
 import { createConnection } from 'typeorm';
 
@@ -17,12 +16,12 @@ import routes from './routes';
 import 'reflect-metadata';
 
 import { getConfig } from './config';
+import { initQueue } from "./modules/mail/mail.service";
 
 createConnection().then(async connection => {
 
     const app = new Koa();
     const port = getConfig().appPort;
-    const mailQueue = new Queue('')
 
     app.use(json());
     app.use(logger());
@@ -45,7 +44,7 @@ createConnection().then(async connection => {
     const server = http.createServer(app.callback());
 
     app.context.io = socket(server);
-
+    initQueue(app.context);
     server.listen(port, () => {
         console.log(port);
     });

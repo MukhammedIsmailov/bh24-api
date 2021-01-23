@@ -22,7 +22,6 @@ import {updateNotification} from '../notification/notification.service';
 import { Messenger } from '../leadMessengers/DTO/IMessengerInfo';
 import { hashSync } from 'bcrypt';
 import { IPasswordReset } from './DTO/IPasswordReset';
-import { sendEmail } from './user.service';
 
 const saltRaunds = 10;
 
@@ -224,6 +223,7 @@ export class UserController {
 
     static async resetPasswordQuery (ctx, next) {
         try {
+            console.log(ctx)
             const data: IPasswordResetQuery = ctx.request.body;
             const { email } = data;
             const userRepository = getManager().getRepository(UserEntity);
@@ -232,7 +232,8 @@ export class UserController {
             if (!!user) {
                 user.resetPasswordHash = v4();
                 await userRepository.save(user);
-                await sendEmail(user.email, user.resetPasswordHash);
+                ctx.queue.add('mail', { email: user.email, resetPasswordHash: user.resetPasswordHash });
+                //await sendEmail(user.email, user.resetPasswordHash);
                 //TODO TODO  TODO TODO TODO
                 //TODO  Queue Bull js  TODO
                 //TODO TODO  TODO TODO TODO
