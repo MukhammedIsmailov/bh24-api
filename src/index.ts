@@ -16,6 +16,7 @@ import routes from './routes';
 import 'reflect-metadata';
 
 import { getConfig } from './config';
+import { initQueue } from "./modules/mail/mail.service";
 
 createConnection().then(async connection => {
 
@@ -43,7 +44,7 @@ createConnection().then(async connection => {
     const server = http.createServer(app.callback());
 
     app.context.io = socket(server);
-
+    initQueue(app.context);
     server.listen(port, () => {
         console.log(port);
     });

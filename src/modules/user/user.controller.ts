@@ -1,6 +1,7 @@
 import {getManager} from 'typeorm';
 import {sign} from 'jsonwebtoken';
 import * as moment from 'moment';
+import { v4 } from 'uuid';
 
 import {UserEntity} from './user.entity';
 import {createValidator, loginValidator, updateValidator} from './user.validator';
@@ -14,10 +15,15 @@ import {ICreateLead} from './DTO/ICreateLead';
 import {IUpdateWard} from './DTO/IUpdateWard';
 import {IReadWard} from './DTO/IReadWard';
 import {IReadLeads} from './DTO/IReadLeads';
+import {IPasswordResetQuery} from './DTO/IPasswordResetQuery';
 import {getConfig} from '../../config';
 import {createNewLeadMessengerItem} from '../leadMessengers/leadMessenger.sevice';
 import {updateNotification} from '../notification/notification.service';
 import { Messenger } from '../leadMessengers/DTO/IMessengerInfo';
+import { hashSync } from 'bcrypt';
+import { IPasswordReset } from './DTO/IPasswordReset';
+
+const saltRaunds = 10;
 
 export class UserController {
     static async me (ctx, next) {
@@ -192,7 +198,7 @@ export class UserController {
                     ]
                 });
                 if (partner) {
-                    if (comparePasswords(partner.password, data.password)) {
+                    if (comparePasswords(partner.password, data.password) && !partner.resetPasswordHash) {
                         const config = getConfig();
                         const token = sign({id: partner.id }, config.jwtSecretKey, {
                             expiresIn: config.jwtTokenExpireInMinutes
@@ -213,6 +219,58 @@ export class UserController {
         }
 
         next();
+    }
+
+    static async resetPasswordQuery (ctx, next) {
+        try {
+            console.log(ctx)
+            const data: IPasswordResetQuery = ctx.request.body;
+            const { email } = data;
+            const userRepository = getManager().getRepository(UserEntity);
+
+            const user = await userRepository.findOne({ where: { email, } })
+            if (!!user) {
+                user.resetPasswordHash = v4();
+                await userRepository.save(user);
+                ctx.queue.add('mail', { email: user.email, resetPasswordHash: user.resetPasswordHash });
+                //await sendEmail(user.email, user.resetPasswordHash);
+                //TODO TODO  TODO TODO TODO
+                //TODO  Queue Bull js  TODO
+                //TODO TODO  TODO TODO TODO
+                ctx.response.body = { message: 'Password recovery link was successfully sent to your email.' };
+
+                ctx.status = 200;
+            } else {
+                ctx.status = 404;
+            }
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+
+        next();
+    }
+
+    static async resetPassword (ctx, next){
+        try {
+            const data: IPasswordReset = ctx.request.body;
+            const { newPassword, resetPasswordHash } = data;
+            const userRepository = getManager().getRepository(UserEntity);
+            const user = await userRepository.findOne({ where: { resetPasswordHash } });
+            if (!!user){
+                user.password = hashSync(newPassword, saltRaunds);
+                user.resetPasswordHash = null;
+                await userRepository.save(user);
+                ctx.response.body = { message: 'Password was successfully changed.' };
+                ctx.status = 200;
+            } else {
+                ctx.status = 404;
+            }
+
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
     }
 
     static async leadCreate (ctx, next) {

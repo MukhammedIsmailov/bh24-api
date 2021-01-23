@@ -116,4 +116,7 @@ export class UserEntity {
 
     @Column()
     subscription_name: string;
+
+    @Column({ name: 'reset_password_hash' })
+    resetPasswordHash: string;
 }

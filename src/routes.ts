@@ -16,6 +16,8 @@ const routes = new Router({ prefix: '/api' });
 // for system
 routes.get('/me',verifyToken, UserController.me);
 routes.post('/login', UserController.authorize);
+routes.put('/reset-password-query', UserController.resetPasswordQuery);
+routes.put('/reset-password', UserController.resetPassword);
 routes.put('/partner', UserController.partnerCreate);
 routes.get('/partner/byId', UserController.partnerReadById);
 routes.get('/partner/byReferId', UserController.partnerReadByReferId);
