@@ -4,7 +4,7 @@ export function emailTemplate (hash: string) {
 
 Забыли пароль от личного кабинета? Не проблема, исправим! Перейдите по ссылке ниже и выполните указанные инструкции.
 
-https://gohappy.team/restore/${hash}
+https://gohappy.team/password-reset?resetPasswordHash=${hash}
 
 Важно!
 Если вы не пытались сбросись пароль на сайте gohappy.team, пожалуйста, проигнорируйте это письмо!
