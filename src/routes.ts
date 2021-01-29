@@ -10,6 +10,7 @@ import { OrderController } from './modules/order/order.controller';
 
 import { verifyToken } from './lib/jwt';
 import { upload } from './lib/upload';
+import { MailController } from './modules/mail/mail.controller';
 
 const routes = new Router({ prefix: '/api' });
 
@@ -36,6 +37,7 @@ routes.get('/lesson/get-count-road-lesson', LessonController.getCountRoadLesson)
 routes.get('/partner/byUserId', UserController.leaderReadByUserId);
 routes.put('/event/feedback-button-click', EventController.feedbackButtonClickLogCreate);
 routes.put('/event/contacts-see', EventController.contactsSeeEventLog);
+routes.post('/bugreport', verifyToken, MailController.bugReport);
 
 //for payment
 routes.post('/order/', verifyToken, OrderController.create);

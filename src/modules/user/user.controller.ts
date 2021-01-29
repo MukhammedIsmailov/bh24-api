@@ -22,6 +22,7 @@ import {updateNotification} from '../notification/notification.service';
 import { Messenger } from '../leadMessengers/DTO/IMessengerInfo';
 import { hashSync } from 'bcrypt';
 import { IPasswordReset } from './DTO/IPasswordReset';
+import {emailTemplateReset} from "../mail/email-template";
 
 const saltRaunds = 10;
 
@@ -232,11 +233,7 @@ export class UserController {
             if (!!user) {
                 user.resetPasswordHash = v4();
                 await userRepository.save(user);
-                ctx.queue.add('mail', { email: user.email, resetPasswordHash: user.resetPasswordHash });
-                //await sendEmail(user.email, user.resetPasswordHash);
-                //TODO TODO  TODO TODO TODO
-                //TODO  Queue Bull js  TODO
-                //TODO TODO  TODO TODO TODO
+                ctx.queue.add('mail', { email: user.email, subject: process.env.EMAIL_SUBJECT, text: emailTemplateReset(user.resetPasswordHash) });
                 ctx.response.body = { message: 'Password recovery link was successfully sent to your email.' };
 
                 ctx.status = 200;

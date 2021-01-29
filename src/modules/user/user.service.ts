@@ -1,6 +1,4 @@
 import { hashSync, compareSync } from 'bcrypt';
-import { createTransport } from 'nodemailer';
-import { emailTemplate } from '../mail/email-template';
 
 const saltRounds: number = 10;
 

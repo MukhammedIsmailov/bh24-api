@@ -1,6 +1,6 @@
 import { Queue, Worker } from "bullmq";
 import { createTransport } from "nodemailer";
-import { emailTemplate } from "./email-template";
+import { emailTemplateReset } from "./email-template";
 
 export function initQueue (appContext) {
     appContext.queue = new Queue('mail', {
@@ -10,11 +10,11 @@ export function initQueue (appContext) {
         }
     });
     new Worker('mail', async ({ data }) => {
-        sendEmail(data.email, data.resetPasswordHash);
+        sendEmail(data);
     });
 }
 
-export async function sendEmail(recipient: string, resetPasswordHash: string) {
+export async function sendEmail(data) {
     const transport = createTransport({
         host: process.env.EMAIL_HOST,
         auth: {
@@ -25,9 +25,9 @@ export async function sendEmail(recipient: string, resetPasswordHash: string) {
 
     const mailOptions = {
         from: process.env.EMAIL_FROM,
-        to: recipient,
-        subject: process.env.EMAIL_SUBJECT,
-        text: emailTemplate(resetPasswordHash)
+        to: data.email,
+        subject: data.subject,
+        text: data.text
     }
 
     await transport.sendMail(mailOptions);
