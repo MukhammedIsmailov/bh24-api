@@ -37,7 +37,7 @@ routes.get('/lesson/get-count-road-lesson', LessonController.getCountRoadLesson)
 routes.get('/partner/byUserId', UserController.leaderReadByUserId);
 routes.put('/event/feedback-button-click', EventController.feedbackButtonClickLogCreate);
 routes.put('/event/contacts-see', EventController.contactsSeeEventLog);
-routes.post('/bugreport', verifyToken, MailController.bugReport);
+routes.post('/bugreport', MailController.bugReport);
 
 //for payment
 routes.post('/order/', verifyToken, OrderController.create);
