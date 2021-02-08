@@ -5,6 +5,7 @@ import { EventEntity } from '../event/event.entity';
 import { IStatisticsForPlotRequest } from './DTO/IStatisticsForPlot';
 import { EventLogs } from '../../lib/eventLogs';
 import { plotDataGenerate } from './statistics.service';
+import {LessonEventEntity} from "../lessonEvent/lessonEvent.entity";
 
 export class StatisticsController {
     static async statisticsRead (ctx, next) {
@@ -56,8 +57,6 @@ export class StatisticsController {
             const visitCountForPaymentEfficiency = !!countsForPaymentEfficiencyRAW[0]['visit'] ? parseInt(countsForPaymentEfficiencyRAW[0]['visit']) : 0;
 
             const paymentEfficiency = !!paidCountForPaymentEfficiency ? Math.round(paidCountForPaymentEfficiency / visitCountForPaymentEfficiency * 100) : 0;
-            const courseEfficiency = !!countOfCourseFinished && !!countOfCourseSubscription ? Math.round(countOfCourseFinished / countOfCourseSubscription * 100) : 0;
-
 
             const counts = [];
             const total = parseInt(totalCount[0]['count']);
@@ -85,11 +84,19 @@ export class StatisticsController {
                 }
             }
 
+            const courseFinished = (await getManager().getRepository(LessonEventEntity)
+                .query(`SELECT count(*) as count
+                    FROM lesson_event JOIN "user" u on u.id = lesson_event.lead_id 
+                    WHERE lesson_number = 4 AND leader_id = ${ctx.currentParnter.id};`))[0].count;
+
+            //const courseEfficiency = Math.round(countOfCourseFinished / countOfCourseSubscription * 100);
+
             ctx.body = {
                 counts,
                 total,
+                courseFinished,
                 paymentEfficiency,
-                courseEfficiency,
+                //courseEfficiency,
                 plotData
             };
 
