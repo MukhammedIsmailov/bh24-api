@@ -363,7 +363,7 @@ export class UserController {
             const startDate = startDateTime.format(psqlDateFormat);
             const endDate = endDateTime.format(psqlDateFormat);
 
-            const subqueriesFilters = new Array(9);
+            const subqueriesFilters = new Array(8);
 
             subqueriesFilters[0] = !!data.facebookFilter ? `lead_messengers."from" = '${Messenger.Facebook}'` : null;
             subqueriesFilters[1] = !!data.telegramFilter ? `lead_messengers."from" = '${Messenger.Telegram}'` : null;
@@ -373,7 +373,7 @@ export class UserController {
             subqueriesFilters[5] = !!data.renouncementFilter ? `"user".status = 'renouncement'` : null;
             subqueriesFilters[6] = !!data.clientFilter ? `"user".status = 'client'` : null;
             subqueriesFilters[7] = !!data.partnerFilter ? `"user".status = 'partner'` : null;
-            subqueriesFilters[8] = `step = ${data.lessonFilter}`;
+            //subqueriesFilters[8] = `step = ${data.lessonFilter}`;
 
             const subquery = getSubquery(subqueriesFilters);
 
@@ -397,7 +397,7 @@ export class UserController {
                                             GROUP BY lesson_event.lead_id) AS lessonEvent ON "user".id = lessonEvent.lead_id
                                 LEFT JOIN (SELECT DISTINCT lead_id AS lead_id, CASE WHEN updated_date IS NULL AND deleted_date IS NULL THEN TRUE ELSE FALSE END 
                                                   AS active FROM notification) AS active ON "user".id = active.lead_id                                             
-                            WHERE "user".refer_id IS NULL AND "user".leader_id = ${leaderId + dateSubquery + subquery + searchSubquery};`;
+                            WHERE "user".refer_id IS NULL AND step >= ${data.lessonFilter} AND "user".leader_id = ${leaderId + dateSubquery + subquery + searchSubquery};`;
 
             const result = await getManager().query(query);
             ctx.response.body = result;
