@@ -87,7 +87,7 @@ export class StatisticsController {
             const courseFinished = (await getManager().getRepository(LessonEventEntity)
                 .query(`SELECT count(*) FROM (SELECT count(*) AS num FROM (SELECT u.id as user_id
             FROM lesson_event JOIN "user" u on u.id = lesson_event.lead_id
-            WHERE (lesson_number = 1 OR lesson_number = 2 OR lesson_number = 3 OR lesson_number = 4) AND reading_date notnull AND leader_id = 20) AS l
+            WHERE (lesson_number = 1 OR lesson_number = 2 OR lesson_number = 3 OR lesson_number = 4) AND reading_date notnull AND leader_id = ${ctx.currentParnter.id}) AS l
             GROUP BY user_id) AS l WHERE num = 4;`))[0].count;
 
             //const courseEfficiency = Math.round(countOfCourseFinished / countOfCourseSubscription * 100);
