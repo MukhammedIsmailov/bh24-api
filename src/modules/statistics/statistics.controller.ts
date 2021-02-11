@@ -50,8 +50,8 @@ export class StatisticsController {
             const countOfCourseFinishedRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseFinished });
             const countOfCourseSubscriptionRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseSubscription });
 
-            const countOfCourseFinished = !!countOfCourseFinishedRAW ? parseInt(countOfCourseFinishedRAW['count']) : 0;
-            const countOfCourseSubscription = !!countOfCourseSubscriptionRAW ? parseInt(countOfCourseSubscriptionRAW['count']) : 0;
+            //const countOfCourseFinished = !!countOfCourseFinishedRAW ? parseInt(countOfCourseFinishedRAW['count']) : 0;
+            //const countOfCourseSubscription = !!countOfCourseSubscriptionRAW ? parseInt(countOfCourseSubscriptionRAW['count']) : 0;
 
             const paidCountForPaymentEfficiency = !!countsForPaymentEfficiencyRAW[0]['paid'] ? parseInt(countsForPaymentEfficiencyRAW[0]['paid']) : 0;
             const visitCountForPaymentEfficiency = !!countsForPaymentEfficiencyRAW[0]['visit'] ? parseInt(countsForPaymentEfficiencyRAW[0]['visit']) : 0;
@@ -85,9 +85,10 @@ export class StatisticsController {
             }
 
             const courseFinished = (await getManager().getRepository(LessonEventEntity)
-                .query(`SELECT count(*) as count
-                    FROM lesson_event JOIN "user" u on u.id = lesson_event.lead_id 
-                    WHERE lesson_number = 4 AND leader_id = ${ctx.currentParnter.id};`))[0].count;
+                .query(`SELECT count(*) FROM (SELECT count(*) AS num FROM (SELECT u.id as user_id
+            FROM lesson_event JOIN "user" u on u.id = lesson_event.lead_id
+            WHERE (lesson_number = 1 OR lesson_number = 2 OR lesson_number = 3 OR lesson_number = 4) AND reading_date notnull AND leader_id = 20) AS l
+            GROUP BY user_id) AS l WHERE num = 4;`))[0].count;
 
             //const courseEfficiency = Math.round(countOfCourseFinished / countOfCourseSubscription * 100);
 
