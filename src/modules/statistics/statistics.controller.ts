@@ -9,8 +9,10 @@ import {LessonEventEntity} from "../lessonEvent/lessonEvent.entity";
 
 export class StatisticsController {
     static async statisticsRead (ctx, next) {
-        const data = <IStatisticsForPlotRequest>ctx.request.query;
-
+        let data = <IStatisticsForPlotRequest>ctx.request.query;
+        data.startDate = data.startDate ?? "0";
+        data.endDate = data.endDate ?? Date.now().toString();
+        data.interval = data.interval ?? 'month';
         const psqlDateFormat = 'YYYY-MM-DD HH:mm:ss';
 
         let endDateTime = !!data.endDate ? moment.unix(parseInt(data.endDate, 10)).utc() : moment().utc();

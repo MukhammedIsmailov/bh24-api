@@ -1,4 +1,4 @@
-import {getManager} from 'typeorm';
+import {getManager, Between, In} from 'typeorm';
 import {sign} from 'jsonwebtoken';
 import * as moment from 'moment';
 import { v4 } from 'uuid';
@@ -23,6 +23,7 @@ import { Messenger } from '../leadMessengers/DTO/IMessengerInfo';
 import { hashSync } from 'bcrypt';
 import { IPasswordReset } from './DTO/IPasswordReset';
 import {emailTemplateReset} from "../mail/email-template";
+import {createLessonEventTable1575742766492} from "../../migrations/1575742766492-create-lesson_event-table";
 
 const saltRaunds = 10;
 
@@ -353,54 +354,57 @@ export class UserController {
     static async wardRead (ctx, next) {
         try {
             const data: IReadWard = ctx.request.body;
-            const leaderId = ctx.currentParnter.id;
 
             const psqlDateFormat = 'YYYY-MM-DD HH:mm:ss';
 
             const endDateTime = moment.unix(parseInt(data.endDateFilter, 10)).utc();
             const startDateTime = moment.unix(parseInt(data.startDateFilter, 10)).utc();
+            const userRepository = getManager().getRepository(UserEntity);
 
-            const startDate = startDateTime.format(psqlDateFormat);
-            const endDate = endDateTime.format(psqlDateFormat);
+            let statuses: Array<string> = [];
+            if (data.partnerFilter) statuses.push('partner');
+            if (data.clientFilter) statuses.push('client');
+            if (data.renouncementFilter) statuses.push('renouncement');
+            if (data.contactFilter) statuses.push('contact');
 
-            const subqueriesFilters = new Array(8);
+            const leader = await userRepository.findOne(ctx.currentParnter);
+            const dataFromDB = await userRepository.find({
+                select: ['id', 'firstName', 'secondName', 'iconUrl', 'country', 'note', 'status', 'createdDate', 'phoneNumber'],
+                where: { leader,  createdDate: Between(startDateTime, endDateTime), status: In(statuses) },
+                relations: ['messengers', 'lessonEvents', 'leadEvents', 'leadNotifications']
+            });
 
-            subqueriesFilters[0] = !!data.facebookFilter ? `lead_messengers."from" = '${Messenger.Facebook}'` : null;
-            subqueriesFilters[1] = !!data.telegramFilter ? `lead_messengers."from" = '${Messenger.Telegram}'` : null;
-            subqueriesFilters[2] = !!data.contactsSeeFilter ? 'contacts > 0' : null;
-            subqueriesFilters[3] = !!data.feedbackFilter ? 'feedback > 0' : null;
-            subqueriesFilters[4] = !!data.contactFilter ? `"user".status = 'contact'` : null;
-            subqueriesFilters[5] = !!data.renouncementFilter ? `"user".status = 'renouncement'` : null;
-            subqueriesFilters[6] = !!data.clientFilter ? `"user".status = 'client'` : null;
-            subqueriesFilters[7] = !!data.partnerFilter ? `"user".status = 'partner'` : null;
-            //subqueriesFilters[8] = `step = ${data.lessonFilter}`;
+            const users = dataFromDB
+                .filter(item =>
+                    !!item.lessonEvents.find(item => item.lessonNumber == +data.lessonFilter && item.readingDate) &&
+                    //TODO: edit where facebook will added
+                    data.telegramFilter &&
+                    ( data.contactsSeeFilter ? item.leadEvents.filter(el => el.eventLog === 'CS').length > 0 : true ) &&
+                    ( data.feedbackFilter ? item.leadEvents.find(el => el.eventLog === 'FB') : true ) &&
+                    ( data.searchFilter ? ( item.firstName + ' ' + item.secondName ).includes(data.searchFilter) : true )
+                )
+                .map(item => ({
+                    id: item.id,
+                    first_name: item.firstName,
+                    second_name: item.secondName,
+                    icon_url: item.iconUrl,
+                    country: item.country,
+                    note: item.note,
+                    status: item.status,
+                    created_date: item.createdDate,
+                    phone_number: item.phoneNumber || null,
+                    username: item.messengers[0].username,
+                    from: item.messengers[0].from,
+                    active: !!item.leadNotifications.find(el => el.deletedDate === null && el.updatedDate === null),
+                    step: Math.max.apply(Math, item.lessonEvents.map(item => item.lessonNumber) as Array<number>),
+                    contacts: item.leadEvents.filter(el => el.eventLog === 'CS').length,
+                    feedback: item.leadEvents.find(el => el.eventLog === 'FB') ? 1 : null,
+                    last_send_time: item.messengers[0].lastSendTime
+                })
+            );
 
-            const subquery = getSubquery(subqueriesFilters);
 
-            const searchSubquery = !!data.searchFilter ? ` AND (position(LOWER(first_name) in '${data.searchFilter.toLocaleLowerCase()}') > 0
-                                                           OR  (position(LOWER(second_name) in '${data.searchFilter.toLocaleLowerCase()}') > 0
-                                                           OR  (position(LOWER(login) in '${data.searchFilter.toLocaleLowerCase()}') > 0)))` : '';
-
-            const dateSubquery = ` AND "user".created_date > '${startDate}' AND "user".created_date < '${endDate}'`;
-
-            const query = `SELECT DISTINCT "user".id, first_name, second_name, icon_url, country, note, status, "from", step,
-                                  "user".created_date, phone_number, last_send_time, username, feedback, contacts, max_lesson_number, active.active
-                            FROM "user"
-                                LEFT JOIN lead_messengers ON "user".id = lead_messengers.user_id
-                                LEFT JOIN event ON "user".id = event.lead_id
-                                LEFT JOIN (SELECT count(CASE WHEN event_log = '${EventLogs.feedbackButtonClick}' THEN 1 ELSE NULL END) AS feedback, 
-                                                  count(CASE WHEN event_log = '${EventLogs.contactsSee}' THEN 1 ELSE NULL END) AS contacts, event.lead_id
-                                            FROM event WHERE event.leader_id = ${leaderId}
-                                            GROUP BY event.lead_id) AS eventCount ON "user".id = eventCount.lead_id
-                                LEFT JOIN (SELECT max(lesson_number) AS max_lesson_number, lesson_event.lead_id
-                                            FROM lesson_event 
-                                            GROUP BY lesson_event.lead_id) AS lessonEvent ON "user".id = lessonEvent.lead_id
-                                LEFT JOIN (SELECT DISTINCT lead_id AS lead_id, CASE WHEN updated_date IS NULL AND deleted_date IS NULL THEN TRUE ELSE FALSE END 
-                                                  AS active FROM notification) AS active ON "user".id = active.lead_id                                             
-                            WHERE "user".refer_id IS NULL AND step >= ${data.lessonFilter} AND "user".leader_id = ${leaderId + dateSubquery + subquery + searchSubquery};`;
-
-            const result = await getManager().query(query);
-            ctx.response.body = result;
+            ctx.response.body = users;
             ctx.status = 200;
         } catch (e) {
             console.log(e);
