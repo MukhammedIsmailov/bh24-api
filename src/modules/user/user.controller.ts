@@ -380,10 +380,11 @@ export class UserController {
                         .find(item => item.lessonNumber == +data.lessonFilter && item.readingDate) ||
                         item.lessonEvents.every(item => item.readingDate) || data.lessonFilter === "any") &&
                     //TODO: edit where facebook will added
-                    data.telegramFilter &&
-                    ( data.contactsSeeFilter ? item.leadEvents.filter(el => el.eventLog === 'CS').length > 0 : true ) &&
-                    ( data.feedbackFilter ? item.leadEvents.find(el => el.eventLog === 'FB') : true ) &&
-                    ( data.searchFilter ? ( item.firstName + ' ' + item.secondName ).includes(data.searchFilter) : true )
+                    data.telegramFilter && (
+                        ( data.contactsSeeFilter ? item.leadEvents.filter(el => el.eventLog === 'CS').length > 0 : true ) ||
+                        ( data.feedbackFilter ? item.leadEvents.find(el => el.eventLog === 'FB') : true )
+                    ) &&
+                        ( data.searchFilter ? ( item.firstName + ' ' + item.secondName ).includes(data.searchFilter) : true )
                 )
                 .map(item => ({
                     id: item.id,
