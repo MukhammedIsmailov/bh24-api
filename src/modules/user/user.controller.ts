@@ -376,7 +376,9 @@ export class UserController {
 
             const users = dataFromDB
                 .filter(item =>
-                    !!item.lessonEvents.find(item => item.lessonNumber == +data.lessonFilter && item.readingDate) &&
+                    !!(+data.lessonFilter < 4 && item.lessonEvents
+                        .find(item => item.lessonNumber == +data.lessonFilter && item.readingDate) ||
+                        item.lessonEvents.every(item => item.readingDate) || data.lessonFilter === "any") &&
                     //TODO: edit where facebook will added
                     data.telegramFilter &&
                     ( data.contactsSeeFilter ? item.leadEvents.filter(el => el.eventLog === 'CS').length > 0 : true ) &&
