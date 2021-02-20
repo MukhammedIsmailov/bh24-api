@@ -361,7 +361,7 @@ export class UserController {
             const startDateTime = moment.unix(parseInt(data.startDateFilter, 10)).utc();
             const userRepository = getManager().getRepository(UserEntity);
 
-            let statuses: Array<string> = [];
+            let statuses: Array<string> = [null];
             if (data.partnerFilter) statuses.push('partner');
             if (data.clientFilter) statuses.push('client');
             if (data.renouncementFilter) statuses.push('renouncement');
@@ -370,21 +370,22 @@ export class UserController {
             const leader = await userRepository.findOne(ctx.currentParnter);
             const dataFromDB = await userRepository.find({
                 select: ['id', 'firstName', 'secondName', 'iconUrl', 'country', 'note', 'status', 'createdDate', 'phoneNumber'],
-                where: { leader,  createdDate: Between(startDateTime, endDateTime), status: In(statuses) },
+                where: { leader,  createdDate: Between(startDateTime, endDateTime)},
                 relations: ['messengers', 'lessonEvents', 'leadEvents', 'leadNotifications']
             });
 
+
             const users = dataFromDB
                 .filter(item =>
-                    !!(+data.lessonFilter < 4 && item.lessonEvents
-                        .find(item => item.lessonNumber == +data.lessonFilter && item.readingDate) ||
-                        item.lessonEvents.every(item => item.readingDate) || data.lessonFilter === "any") &&
-                    //TODO: edit where facebook will added
-                    data.telegramFilter && (
-                        ( data.contactsSeeFilter ? item.leadEvents.filter(el => el.eventLog === 'CS').length > 0 : true ) ||
-                        ( data.feedbackFilter ? item.leadEvents.find(el => el.eventLog === 'FB') : true )
+                    (
+                        (data.telegramFilter && item.messengers[0].from === 'telegram' || data.facebookFilter && item.messengers[0].from === 'facebook') ||
+                        item.status ? statuses.includes(item.status) : false
                     ) &&
-                        ( data.searchFilter ? ( item.firstName + ' ' + item.secondName ).includes(data.searchFilter) : true )
+                    (data.contactsSeeFilter ? item.leadEvents.find(e => e.eventLog == 'CS') : true) &&
+                    (data.feedbackFilter ? item.leadEvents.find(e => e.eventLog == 'FB') : true) &&
+                    (data.lessonFilter === 'any' || +data.lessonFilter == 4 && item.lessonEvents.filter(e => e.readingDate).length >= 4 ||
+                    !!item.lessonEvents.find(e => e.lessonNumber == +data.lessonFilter && e.readingDate )) &&
+                    (!data.searchFilter || (item.firstName + item.secondName).toLowerCase().includes(data.searchFilter.toLowerCase()) )
                 )
                 .map(item => ({
                     id: item.id,
