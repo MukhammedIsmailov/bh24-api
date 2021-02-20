@@ -385,7 +385,7 @@ export class UserController {
                     (data.feedbackFilter ? item.leadEvents.find(e => e.eventLog == 'FB') : true) &&
                     (data.lessonFilter === 'any' || +data.lessonFilter == 4 && item.lessonEvents.filter(e => e.readingDate).length >= 4 ||
                     !!item.lessonEvents.find(e => e.lessonNumber == +data.lessonFilter && e.readingDate )) &&
-                    (!data.searchFilter || (item.firstName + item.secondName).toLowerCase().includes(data.searchFilter.toLowerCase()) )
+                    (data.searchFilter == null || (item.firstName + item.secondName).toLowerCase().includes(data.searchFilter.toLowerCase()) )
                 )
                 .map(item => ({
                     id: item.id,
