@@ -71,7 +71,7 @@ export class UserController {
 
             if (!!id) {
                 const userRepository = getManager().getRepository(UserEntity);
-                const partner = await userRepository.findOne({ where: { id: id }});
+                const partner = await userRepository.findOne({ where: { id: id }, relations: ['messengers']});
                 if (!!partner) {
                     const { note, status, country, role,  ...payloadData } = partner;
                     payloadData.password = payloadData.password !== null ? '*******' : null;
