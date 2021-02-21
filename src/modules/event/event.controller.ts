@@ -60,12 +60,15 @@ export class EventController {
 
     static async feedbackButtonClickLogCreate (ctx, next) {
         const data: ICourseFinishedLog = ctx.request.body;
+        console.log(data)
 
         if (!!data.userId) {
             try {
                 const userRepository = getManager().getRepository(UserEntity);
 
                 const user = await userRepository.findOne({where: { id: data.userId }, relations: ['leader', 'messengers']});
+                user.phoneNumber = data.phoneNumber;
+                await userRepository.save(user);
 
                 if (!!user && !!user.leader) {
                     const currentDate = new Date();
