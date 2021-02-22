@@ -37,29 +37,6 @@ export class StatisticsController {
 
             const totalCount = await eventRepository.query(`SELECT count(id) FROM event WHERE leader_id = ${ctx.currentParnter.id};`);
 
-            const countsForPaymentEfficiencyRAW = await eventRepository.query(`SELECT count(DISTINCT "user".id) AS paid,
-                                                                                            count(event_log) AS visit
-                                                                                      FROM "user"
-                                                                                      LEFT JOIN event ON "user".leader_id = event.leader_id
-                                                                                      WHERE "user".leader_id = ${ctx.currentParnter.id}
-                                                                                          AND ("user".role = 'partner' OR "user".role = 'client')
-                                                                                          AND event.event_log = 'VL';`);
-
-            const countsForCourseEfficiency = await eventRepository.query(`SELECT count(id), event_log FROM event 
-                WHERE (event_log = '${EventLogs.courseSubscription}' OR event_log = '${EventLogs.courseFinished}') AND leader_id = ${ctx.currentParnter.id}
-                GROUP BY event_log;`);
-
-            const countOfCourseFinishedRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseFinished });
-            const countOfCourseSubscriptionRAW = countsForCourseEfficiency.find(item => { return item['event_log'] === EventLogs.courseSubscription });
-
-            //const countOfCourseFinished = !!countOfCourseFinishedRAW ? parseInt(countOfCourseFinishedRAW['count']) : 0;
-            //const countOfCourseSubscription = !!countOfCourseSubscriptionRAW ? parseInt(countOfCourseSubscriptionRAW['count']) : 0;
-
-            const paidCountForPaymentEfficiency = !!countsForPaymentEfficiencyRAW[0]['paid'] ? parseInt(countsForPaymentEfficiencyRAW[0]['paid']) : 0;
-            const visitCountForPaymentEfficiency = !!countsForPaymentEfficiencyRAW[0]['visit'] ? parseInt(countsForPaymentEfficiencyRAW[0]['visit']) : 0;
-
-            const paymentEfficiency = !!paidCountForPaymentEfficiency ? Math.round(paidCountForPaymentEfficiency / visitCountForPaymentEfficiency * 100) : 0;
-
             const counts = [];
             const total = parseInt(totalCount[0]['count']);
 
@@ -86,20 +63,20 @@ export class StatisticsController {
                 }
             }
 
+            const paymentEfficiency = Math.round((counts[5]['NC'] + counts[4]['NP']) / counts[0]['VL'] * 100 );
+
             const courseFinished = (await getManager().getRepository(LessonEventEntity)
                 .query(`SELECT count(*) FROM (SELECT count(*) AS num FROM (SELECT u.id as user_id
             FROM lesson_event JOIN "user" u on u.id = lesson_event.lead_id
             WHERE (lesson_number = 1 OR lesson_number = 2 OR lesson_number = 3 OR lesson_number = 4) AND reading_date notnull AND leader_id = ${ctx.currentParnter.id}) AS l
             GROUP BY user_id) AS l WHERE num = 4;`))[0].count;
 
-            //const courseEfficiency = Math.round(countOfCourseFinished / countOfCourseSubscription * 100);
 
             ctx.body = {
                 counts,
                 total,
                 courseFinished,
                 paymentEfficiency,
-                //courseEfficiency,
                 plotData
             };
 
