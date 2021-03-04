@@ -304,7 +304,7 @@ export class UserController {
             console.log(e);
             ctx.status = 500;
         }
-        
+
         next();
     }
 
@@ -378,7 +378,7 @@ export class UserController {
             const users = dataFromDB
                 .filter(item =>
                     (
-                        (data.telegramFilter && item.messengers[0].from === 'telegram' || data.facebookFilter && item.messengers[0].from === 'facebook') ||
+                        (data.telegramFilter && item.messengers.length > 0 /*[0].from === 'telegram' || data.facebookFilter && item.messengers[0].from === 'facebook'*/) ||
                         item.status ? statuses.includes(item.status) : false
                     ) &&
                     (data.contactsSeeFilter ? item.leadEvents.find(e => e.eventLog == 'CS') : true) &&
