@@ -7,6 +7,7 @@ import { StatisticsController } from './modules/statistics/statistics.controller
 import { LessonEventController } from './modules/lessonEvent/lessonEvent.controller';
 import { LessonController } from './modules/lesson/lesson.controller';
 import { OrderController } from './modules/order/order.controller';
+import { IpController } from './modules/ip/ip.controller';
 
 import { verifyToken } from './lib/jwt';
 import { upload } from './lib/upload';
@@ -38,6 +39,7 @@ routes.get('/partner/byUserId', UserController.leaderReadByUserId);
 routes.put('/event/feedback-button-click', EventController.feedbackButtonClickLogCreate);
 routes.put('/event/contacts-see', EventController.contactsSeeEventLog);
 routes.post('/bugreport', MailController.bugReport);
+routes.get('/getCountryByIp', IpController.getGeoByIp);
 
 //for payment
 routes.post('/order/', verifyToken, OrderController.create);
