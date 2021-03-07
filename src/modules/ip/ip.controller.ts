@@ -3,7 +3,7 @@ import * as axios from 'axios';
 export class IpController {
     static async getGeoByIp (ctx, next) {
         try {
-            const ip = ctx.request.ip.replace('::ffff:', '');
+            const ip = ctx.request.ip;
             console.log(ip.toString())
             const resp = await axios.default.get(`https://ipapi.co/${ip}/country/`);
             const country = resp.data;

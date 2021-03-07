@@ -22,6 +22,7 @@ createConnection().then(async connection => {
 
     const app = new Koa();
     const port = getConfig().appPort;
+    app.proxy = true;
 
     app.use(json());
     app.use(logger());
