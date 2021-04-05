@@ -42,7 +42,7 @@ routes.put('/event/contacts-see', EventController.contactsSeeEventLog);
 routes.post('/bugreport', MailController.bugReport);
 routes.get('/getCountryByIp', IpController.getGeoByIp);
 routes.post('/comments', CommentController.commentCreate);
-
+routes.get('/comments', CommentController.commentRead);
 //for payment
 routes.post('/order/', verifyToken, OrderController.create);
 routes.post('/check/', OrderController.check);

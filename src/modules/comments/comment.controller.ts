@@ -27,4 +27,20 @@ export class CommentController {
             ctx.status = 500;
         }
     }
+
+    static  async commentRead (ctx, next) {
+        try {
+            const commentsRepository = getManager().getRepository(CommentEntity);
+            const lessonRepository = getManager().getRepository(LessonEntity);
+            const lessonId = ctx.request.query.lessonId;
+
+            const lesson = await lessonRepository.findOne(lessonId);
+            const foundComment = await commentsRepository.find({ where: { lesson } });
+            ctx.response.body = foundComment;
+            ctx.status = 200;
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+    }
 }
