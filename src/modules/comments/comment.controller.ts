@@ -35,7 +35,7 @@ export class CommentController {
             const lessonId = ctx.request.query.lessonId;
 
             const lesson = await lessonRepository.findOne(lessonId);
-            const foundComment = await commentsRepository.find({ where: { lesson } });
+            const foundComment = await commentsRepository.find({ where: { lesson }, relations: ['user', 'lesson'] });
             ctx.response.body = foundComment;
             ctx.status = 200;
         } catch (e) {
