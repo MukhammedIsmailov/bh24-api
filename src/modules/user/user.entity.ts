@@ -5,6 +5,7 @@ import { LeadMessengersEntity } from '../leadMessengers/leadMessengers.entity';
 import { LessonEventEntity } from '../lessonEvent/lessonEvent.entity';
 import { NotificationEntity } from '../notification/notification.entity';
 import { OrderEntity } from '../order/order.entity';
+import { CommentsEntity } from '../comments/comments.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity {
@@ -110,6 +111,9 @@ export class UserEntity {
 
     @OneToMany(() => OrderEntity, order => order.user)
     orders: OrderEntity[];
+
+    @OneToMany(() => CommentsEntity, comment => comment.user)
+    comments: CommentsEntity[];
 
     @Column()
     subscription_end: string;

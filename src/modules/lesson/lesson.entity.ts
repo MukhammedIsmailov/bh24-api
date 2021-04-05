@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from 'typeorm';
+import {CommentsEntity} from "../comments/comments.entity";
 
 @Entity({ name: 'lesson' })
 export class LessonEntity {
@@ -16,4 +17,7 @@ export class LessonEntity {
 
     @Column()
     video: string;
+
+    @OneToMany(() => CommentsEntity, comment => comment.lesson)
+    comments: CommentsEntity[];
 }
