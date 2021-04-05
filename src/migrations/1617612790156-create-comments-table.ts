@@ -14,8 +14,12 @@ export class createCommentsTable1617612790156 implements MigrationInterface {
                     generationStrategy: 'increment'
                 },
                 {
-                    name: 'createdDate',
+                    name: 'created_date',
                     type: 'timestamp'
+                },
+                {
+                    name: 'text',
+                    type: 'varchar'
                 }
             ]
         }));

@@ -12,6 +12,7 @@ import { IpController } from './modules/ip/ip.controller';
 import { verifyToken } from './lib/jwt';
 import { upload } from './lib/upload';
 import { MailController } from './modules/mail/mail.controller';
+import {CommentController} from "./modules/comments/comment.controller";
 
 const routes = new Router({ prefix: '/api' });
 
@@ -40,6 +41,7 @@ routes.put('/event/feedback-button-click', EventController.feedbackButtonClickLo
 routes.put('/event/contacts-see', EventController.contactsSeeEventLog);
 routes.post('/bugreport', MailController.bugReport);
 routes.get('/getCountryByIp', IpController.getGeoByIp);
+routes.post('/comments', CommentController.commentCreate);
 
 //for payment
 routes.post('/order/', verifyToken, OrderController.create);

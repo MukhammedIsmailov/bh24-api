@@ -3,8 +3,8 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColum
 import { UserEntity } from '../user/user.entity';
 import { LessonEntity } from '../lesson/lesson.entity';
 
-@Entity({ name: 'lead_messengers' })
-export class CommentsEntity {
+@Entity({ name: 'comments' })
+export class CommentEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -18,4 +18,7 @@ export class CommentsEntity {
     @ManyToOne(type => LessonEntity, lesson => lesson.comments)
     @JoinColumn({ name: 'lesson_id' })
     lesson: LessonEntity
+
+    @Column()
+    text: string;
 }
