@@ -24,7 +24,7 @@ routes.put('/reset-password', UserController.resetPassword);
 routes.put('/partner', UserController.partnerCreate);
 routes.get('/partner/byId', UserController.partnerReadById);
 routes.get('/partner/byReferId', UserController.partnerReadByReferId);
-routes.post('/partner', UserController.partnerUpdate);
+routes.post('/partner', verifyToken, UserController.partnerUpdate);
 routes.post('/upload', upload);
 routes.post('/ward', verifyToken, UserController.wardUpdate);
 routes.post('/wards', verifyToken, UserController.wardRead);

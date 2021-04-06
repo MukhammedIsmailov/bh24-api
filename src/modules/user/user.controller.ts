@@ -130,10 +130,14 @@ export class UserController {
                     ...data, createdDate: new Date().toISOString(), role: 'partner', leader: leader, country: data.country,
                 });
                 const createdPartner = await userRepository.save(newPartner);
+                const config = getConfig();
+                const token = sign({id: newPartner.id }, config.jwtSecretKey, {
+                    expiresIn: config.jwtTokenExpireInMinutes
+                });
 
                 const { note, status, country, role,   ...responseData } = createdPartner;
 
-                ctx.response.body = responseData;
+                ctx.response.body = { ...responseData, token };
                 ctx.status = 200;
             } else {
                 ctx.status = 400;
@@ -153,28 +157,32 @@ export class UserController {
             const id = Number.parseInt(ctx.request.query.id);
 
             const userRepository = getManager().getRepository(UserEntity);
+            console.log(ctx.currentParnter)
+            if (ctx.currentParnter.id === id) {
+                const partner = await userRepository.findOne({id: id});
+                if (!!partner) {
+                    const wrongFields = await updateValidator(id, data, userRepository);
+                    if (wrongFields.length === 0) {
+                        if (!!data.password) {
+                            data.password = getEncryptedPassword(data.password);
+                        }
+                        await userRepository.update(id, data);
+                        const updatedPartner = await userRepository.findOne({id: id});
 
-            const partner = await userRepository.findOne({ id: id });
-            if (!!partner) {
-                const wrongFields = await updateValidator(id, data, userRepository);
-                if (wrongFields.length === 0) {
-                    if (!!data.password) {
-                        data.password = getEncryptedPassword(data.password);
+                        const {note, status, country, role, ...responseData} = updatedPartner;
+                        responseData.password = responseData.password !== null ? '*******' : null;
+
+                        ctx.response.body = responseData;
+                        ctx.status = 200;
+                    } else {
+                        ctx.response.body = wrongFields;
+                        ctx.status = 400;
                     }
-                    await userRepository.update(id, data);
-                    const updatedPartner = await userRepository.findOne({ id: id });
-
-                    const { note, status, country, role,  ...responseData } = updatedPartner;
-                    responseData.password = responseData.password !== null ? '*******' : null;
-
-                    ctx.response.body = responseData;
-                    ctx.status = 200;
                 } else {
-                    ctx.response.body = wrongFields;
-                    ctx.status = 400;
+                    ctx.status = 404;
                 }
             } else {
-                ctx.status = 404;
+                ctx.status = 403;
             }
         } catch (e) {
             console.log(e);
