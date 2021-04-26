@@ -14,7 +14,15 @@ export class addPageTable1619442398918 implements MigrationInterface {
                     generationStrategy: 'increment'
                 },
                 {
+                    name: 'is_system',
+                    type: 'boolean'
+                },
+                {
                     name: 'name',
+                    type: 'varchar'
+                },
+                {
+                    name: 'verbose_name',
                     type: 'varchar'
                 },
                 {

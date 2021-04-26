@@ -6,6 +6,12 @@ export class ProductEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ name: 'is_system' })
+    isSystem: boolean;
+
+    @Column({ name: 'verbose_name' })
+    verboseName: string;
+
     @Column()
     name: string;
 
