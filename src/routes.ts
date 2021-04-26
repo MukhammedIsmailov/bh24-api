@@ -34,6 +34,7 @@ routes.get('/leads', verifyToken, UserController.leadsRead);
 routes.get('/latest-registrations', StatisticsController.latestRegistrationsRead);
 routes.get('/latest-registrations-by-leaders', StatisticsController.latestRegistrationsByLeaders);
 routes.get('/lesson', LessonController.lessonRead);
+routes.get('/lesson/all', LessonController.lessonReadAll);
 routes.post('/lesson', LessonController.lessonCreate);
 routes.put('/lesson', LessonController.lessonUpdate);
 routes.delete('/lesson', LessonController.lessonDelete);

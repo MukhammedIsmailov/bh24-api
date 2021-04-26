@@ -20,6 +20,18 @@ export class LessonController {
         next();
     }
 
+    static async lessonReadAll(ctx, next){
+        try {
+            const lessonRepository = await getManager().getRepository(LessonEntity);
+            const dataFromDB = await lessonRepository.find();
+            ctx.response.body = dataFromDB;
+            ctx.status = 200;
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+    }
+
     static async lessonCreate(ctx, next) {
         try {
             const data: ILesson = ctx.request.body;
