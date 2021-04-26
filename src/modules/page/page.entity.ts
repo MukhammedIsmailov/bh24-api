@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, OneToMany, JoinColumn, Column } from 'typeorm';
 import { OrderEntity } from '../order/order.entity';
 
-@Entity({ name: 'product' })
-export class ProductEntity {
+@Entity({ name: 'page' })
+export class PageEntity {
     @PrimaryGeneratedColumn()
     id: number;
 

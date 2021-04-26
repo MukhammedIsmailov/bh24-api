@@ -12,7 +12,8 @@ import { IpController } from './modules/ip/ip.controller';
 import { verifyToken } from './lib/jwt';
 import { upload } from './lib/upload';
 import { MailController } from './modules/mail/mail.controller';
-import {CommentController} from "./modules/comments/comment.controller";
+import { CommentController } from './modules/comments/comment.controller';
+import { PageController } from './modules/page/page.controller';
 
 const routes = new Router({ prefix: '/api' });
 
@@ -47,6 +48,11 @@ routes.post('/bugreport', MailController.bugReport);
 routes.get('/getCountryByIp', IpController.getGeoByIp);
 routes.post('/comments', CommentController.commentCreate);
 routes.get('/comments', CommentController.commentRead);
+routes.get('/page/all', PageController.pageReadAll);
+routes.get('/page', PageController.pageRead);
+routes.post('/page', PageController.pageCreate);
+routes.put('/page', PageController.pageUpdate);
+routes.delete('/page', PageController.pageDelete);
 //for payment
 routes.post('/order/', verifyToken, OrderController.create);
 routes.post('/check/', OrderController.check);
