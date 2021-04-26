@@ -18,6 +18,9 @@ export class LessonEntity {
     @Column()
     video: string;
 
+    @Column()
+    message: string;
+
     @OneToMany(() => CommentEntity, comment => comment.lesson)
     comments: CommentEntity[];
 }

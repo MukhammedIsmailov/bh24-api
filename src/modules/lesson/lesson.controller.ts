@@ -1,6 +1,7 @@
 import { getManager } from 'typeorm';
 
 import { LessonEntity } from './lesson.entity';
+import {ILesson} from './DTO/ILesson';
 
 export class LessonController {
     static async lessonRead(ctx, next) {
@@ -18,6 +19,66 @@ export class LessonController {
         }
         next();
     }
+
+    static async lessonCreate(ctx, next) {
+        try {
+            const data: ILesson = ctx.request.body;
+            const lessonRepository = await getManager().getRepository(LessonEntity);
+            const lessonId = data.lessonId;
+            const dataFromDB = await lessonRepository.find({ where: { lessonId } });
+            if (dataFromDB.length == 0) {
+                const createdLesson = await lessonRepository.create(data);
+                await lessonRepository.save(createdLesson);
+                ctx.status = 200;
+                next();
+            } else {
+                ctx.status = 400;
+            }
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+    }
+
+    static async lessonUpdate(ctx, next) {
+        try {
+            const lessonId = ctx.request.query.lessonId;
+            const data: ILesson = ctx.request.body;
+            const lessonRepository = await getManager().getRepository(LessonEntity);
+
+            const dataFromDB = await lessonRepository.findOne({ where: { lessonId } });
+            if (dataFromDB){
+                await lessonRepository.update({lessonId}, data);
+                ctx.status = 200;
+                next();
+            } else {
+                ctx.status = 404;
+            }
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+    }
+
+    static async lessonDelete(ctx, next) {
+        try {
+            const lessonId = ctx.request.query.lessonId;
+            const lessonRepository = await getManager().getRepository(LessonEntity);
+            const dataFromDB = await lessonRepository.findOne({ lessonId });
+            if (dataFromDB) {
+                await lessonRepository.delete({ lessonId });
+                ctx.status = 200;
+                next();
+            } else {
+                ctx.status = 404;
+            }
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+    }
+
+    static async
 
     static async lessonIsDone(ctx, next) {
         try {
