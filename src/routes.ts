@@ -14,6 +14,7 @@ import { upload } from './lib/upload';
 import { MailController } from './modules/mail/mail.controller';
 import { CommentController } from './modules/comments/comment.controller';
 import { PageController } from './modules/page/page.controller';
+import { ContentController } from './modules/content/content.controller';
 
 const routes = new Router({ prefix: '/api' });
 
@@ -53,6 +54,10 @@ routes.get('/page', PageController.pageRead);
 routes.post('/page', PageController.pageCreate);
 routes.put('/page', PageController.pageUpdate);
 routes.delete('/page', PageController.pageDelete);
+routes.post('/content', ContentController.contentCreate);
+routes.get('/content', ContentController.contentRead);
+routes.put('/content', ContentController.contentUpdate);
+routes.delete('/content', ContentController.contentDelete);
 //for payment
 routes.post('/order/', verifyToken, OrderController.create);
 routes.post('/check/', OrderController.check);
