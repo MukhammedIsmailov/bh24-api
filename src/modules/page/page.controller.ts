@@ -90,11 +90,11 @@ export class PageController {
             });
 
             if (!dataFromDB.find(item => item.id == pageId)) {
-                await  pageRepository.update(pageId, data);
+                ctx.status = 400;
+            } else {
+                await pageRepository.update(pageId, data);
                 ctx.status = 200;
                 next();
-            } else {
-                ctx.status = 400;
             }
         } catch (e) {
             console.log(e);
