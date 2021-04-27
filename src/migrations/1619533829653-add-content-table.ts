@@ -1,10 +1,10 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
 
-export class addPageTable1619442398918 implements MigrationInterface {
+export class addContentTable1619533829653 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(new Table({
-            name: 'page',
+            name: 'content',
             columns: [
                 {
                     name: 'id',
@@ -14,23 +14,26 @@ export class addPageTable1619442398918 implements MigrationInterface {
                     generationStrategy: 'increment'
                 },
                 {
-                    name: 'is_system',
-                    type: 'boolean'
-                },
-                {
-                    name: 'name',
+                    name: 'body',
                     type: 'varchar'
                 },
                 {
-                    name: 'verbose_name',
-                    type: 'varchar'
+                    name: 'page_id',
+                    type: 'int'
                 }
             ]
+        }));
+
+        await queryRunner.createForeignKey('content', new TableForeignKey({
+            columnNames: ['page_id'],
+            referencedColumnNames: ['id'],
+            referencedTableName: 'page',
+            onDelete: 'CASCADE'
         }));
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable('page');
+        await queryRunner.dropTable('content');
     }
 
 }

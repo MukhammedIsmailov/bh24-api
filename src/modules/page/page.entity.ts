@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, JoinColumn, Column } from 'typeorm';
-import { OrderEntity } from '../order/order.entity';
+import { Entity, PrimaryGeneratedColumn, OneToMany, Column } from 'typeorm';
+import { ContentEntity } from '../content/content.entity';
 
 @Entity({ name: 'page' })
 export class PageEntity {
@@ -15,6 +15,6 @@ export class PageEntity {
     @Column()
     name: string;
 
-    @Column('varchar',{ array: true })
-    content: string[];
+    @OneToMany(() => ContentEntity, content => content.page)
+    content: ContentEntity[];
 }

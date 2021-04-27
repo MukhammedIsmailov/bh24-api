@@ -52,10 +52,10 @@ export class PageController {
             let dataFromDb;
 
             if (pageId && !name) {
-                dataFromDb = await pageRepository.findOne(pageId);
+                dataFromDb = await pageRepository.findOne(pageId, { relations: [ 'content' ] });
             }
             else if (!pageId && name ) {
-                dataFromDb = await pageRepository.findOne({ name });
+                dataFromDb = await pageRepository.findOne({ name, }, { relations: [ 'content' ] });
             }
             else {
                 ctx.status = 400;
