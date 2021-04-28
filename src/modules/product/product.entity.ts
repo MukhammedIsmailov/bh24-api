@@ -18,4 +18,7 @@ export class ProductEntity {
 
     @Column()
     duration: number;
+
+    @Column()
+    description: string;
 }

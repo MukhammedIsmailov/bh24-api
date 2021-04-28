@@ -15,6 +15,7 @@ import { MailController } from './modules/mail/mail.controller';
 import { CommentController } from './modules/comments/comment.controller';
 import { PageController } from './modules/page/page.controller';
 import { ContentController } from './modules/content/content.controller';
+import { ProductController } from './modules/product/product.controller';
 
 const routes = new Router({ prefix: '/api' });
 
@@ -58,6 +59,11 @@ routes.post('/content', ContentController.contentCreate);
 routes.get('/content', ContentController.contentRead);
 routes.put('/content', ContentController.contentUpdate);
 routes.delete('/content', ContentController.contentDelete);
+routes.post('/product', ProductController.productCreate);
+routes.get('/product', ProductController.productRead);
+routes.get('/product/all', ProductController.productReadAll);
+routes.put('/product', ProductController.productUpdate);
+routes.delete('/product', ProductController.productDelete);
 //for payment
 routes.post('/order/', verifyToken, OrderController.create);
 routes.post('/check/', OrderController.check);
