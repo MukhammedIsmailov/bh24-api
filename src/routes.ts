@@ -16,6 +16,7 @@ import { CommentController } from './modules/comments/comment.controller';
 import { PageController } from './modules/page/page.controller';
 import { ContentController } from './modules/content/content.controller';
 import { ProductController } from './modules/product/product.controller';
+import { FileController } from './modules/file/file.controller';
 
 const routes = new Router({ prefix: '/api' });
 
@@ -64,6 +65,9 @@ routes.get('/product', ProductController.productRead);
 routes.get('/product/all', ProductController.productReadAll);
 routes.put('/product', ProductController.productUpdate);
 routes.delete('/product', ProductController.productDelete);
+routes.post('/file', FileController.fileCreate);
+routes.get('/file/all', FileController.fileReadAll);
+routes.delete('/file', FileController.fileDelete);
 //for payment
 routes.post('/order/', verifyToken, OrderController.create);
 routes.post('/check/', OrderController.check);
