@@ -58,6 +58,7 @@ routes.put('/page', PageController.pageUpdate);
 routes.delete('/page', PageController.pageDelete);
 routes.post('/content', ContentController.contentCreate);
 routes.get('/content', ContentController.contentRead);
+routes.get('/content/all', ContentController.contentReadByPageId);
 routes.put('/content', ContentController.contentUpdate);
 routes.delete('/content', ContentController.contentDelete);
 routes.post('/product', ProductController.productCreate);
