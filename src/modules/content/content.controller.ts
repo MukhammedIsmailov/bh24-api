@@ -13,7 +13,8 @@ export class ContentController {
             const page = await pageRepository.findOne(data.pageId);
             if (!!page) {
                 const content = await contentRepository.create({ ...data, page });
-                await contentRepository.save(content);
+                const { id, body } = await contentRepository.save(content);
+                ctx.response.body = { id, body };
                 ctx.status = 200;
                 next();
             } else {
