@@ -6,8 +6,29 @@ import { UserEntity } from '../user/user.entity';
 import { EventLogs } from '../../lib/eventLogs';
 import { trackEventLog } from './event.service';
 import { createNotification } from '../notification/notification.service';
+import { EventEntity } from './event.entity';
+import { IEventCreate } from './DTO/IEventCreate';
+
 
 export class EventController {
+    static async create (ctx, next) {
+        try {
+            const data: IEventCreate = ctx.request.body;
+            const eventRepository = getManager().getRepository(EventEntity);
+            const userRepository = getManager().getRepository(UserEntity);
+            const leader = await userRepository.findOne(data.referId);
+            const event = await eventRepository.create({
+                leader, eventLog: data.eventLog, createdDate: new Date().toISOString()
+            });
+            await eventRepository.save(event);
+            ctx.status = 201;
+            next();
+        } catch (e) {
+            console.log(e);
+            ctx.status = 500;
+        }
+    }
+
     static async landingVisitLogCreate (ctx, next) {
         const data: ILandingVisitLog = ctx.request.body;
 

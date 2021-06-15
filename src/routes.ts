@@ -82,6 +82,7 @@ routes.get('/lead/messenger/all', LeadMessengersController.readAll);
 routes.post('/lead/messenger', LeadMessengersController.update);
 routes.put('/event/course-finished', EventController.courseFinishedLogCreate);
 routes.put('/lesson-event', LessonEventController.lessonEventLogCreate);
+routes.post('/event', EventController.create);
 
 
 export default routes;
