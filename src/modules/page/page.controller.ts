@@ -33,7 +33,7 @@ export class PageController {
     static async pageReadAll(ctx, next) {
         try {
             const pageRepository = getManager().getRepository(PageEntity);
-            const dataFromDB = await pageRepository.find({ select: [ 'id', 'isSystem', 'name', 'verboseName' ] });
+            const dataFromDB = await pageRepository.find({ select: [ 'id', 'isSystem', 'name', 'verboseName', 'isFree' ] });
 
             ctx.response.body = dataFromDB;
             ctx.status = 200;
