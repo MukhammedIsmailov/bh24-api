@@ -15,6 +15,9 @@ export class PageEntity {
     @Column()
     name: string;
 
+    @Column({ name: 'is_free' })
+    isFree: boolean;
+
     @OneToMany(() => ContentEntity, content => content.page)
     content: ContentEntity[];
 }
