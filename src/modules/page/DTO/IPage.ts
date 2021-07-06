@@ -3,4 +3,5 @@ export interface IPage {
     name: string;
     verboseName: string;
     isFree: boolean;
+    isPublic: boolean;
 }
